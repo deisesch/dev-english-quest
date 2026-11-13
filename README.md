@@ -51,31 +51,12 @@ São 6 mundos, 30 fases e 252 atividades.
 | `GUIA-DE-INSTALACAO.md` | Passo a passo de instalação e uso para o professor |
 | `README.md` | Este arquivo |
 
-## Como usar em outra turma
-
-1. Faça um fork deste repositório ou baixe os arquivos.
-2. Crie uma planilha Google e publique o `Code.gs` como App da Web.
-3. No `index.html`, troque o valor de `ENDPOINT_URL` pela URL do seu App da Web.
-4. Ative o GitHub Pages em Settings > Pages.
-
-O passo a passo completo está em `GUIA-DE-INSTALACAO.md`.
-
 ## Privacidade
 
 - O jogo envia nome completo, turma e resultados somente para a planilha do professor.
 - Nenhum dado de aluno fica neste repositório.
 - A planilha deve ter acesso restrito ao professor e à coordenação (LGPD).
 
-## Limitações conhecidas
-
-- As respostas ficam no código-fonte. O teste de nível deve ser aplicado em sala, com acompanhamento.
-- O jogo não tem senha: em computador compartilhado, um aluno pode abrir o perfil de outro.
-- O teste de nível é um diagnóstico de sala, não um exame certificado.
-
 ## Autoria
 
 Desenvolvido por [deisesch](https://github.com/deisesch) para o curso Técnico em Desenvolvimento de Sistemas da Firjan SENAI Petrópolis, com apoio de inteligência artificial (Claude, da Anthropic) na programação e na elaboração das atividades.
-
-## Licença
-
-A definir.
