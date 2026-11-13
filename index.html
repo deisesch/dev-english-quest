@@ -7,6 +7,7 @@
 <style>
 :root{--ink:#1B1464;--grape:#5B2EFF;--sun:#FFD23F;--pink:#FF5C8A;--mint:#2EE6A6;--sky:#3EC5FF;--orange:#FF8A3D;--lilac:#E9E3FF;--ok:#0B7A54;--okbg:#D6FBEC;--err:#C2185B;--errbg:#FFE1EB;--muted:#544E8C;--off:#D9D5EC}
 *{box-sizing:border-box}
+[hidden]{display:none !important}
 html{font-size:17px}
 body{margin:0;font-family:"Trebuchet MS",Trebuchet,Tahoma,sans-serif;color:var(--ink);line-height:1.5;background-color:var(--grape);background-image:radial-gradient(rgba(255,255,255,.16) 2px,transparent 2.6px);background-size:28px 28px}
 body.modoB{font-size:1.22rem;line-height:1.85;letter-spacing:.02em;background-image:none}
@@ -70,6 +71,7 @@ label.check input{width:1.3em;height:1.3em;margin-top:.2em;flex:none;accent-colo
 .world .banner{display:flex;gap:16px;align-items:center;padding:14px 20px;border-bottom:3px solid var(--ink)}
 .world .banner .svg{width:210px;height:84px;flex:none}
 .world.w1 .banner{background:var(--sky)}.world.w2 .banner{background:var(--pink)}
+.world.w3 .banner{background:var(--mint)}.world.w4 .banner{background:var(--sun)}.world.w5 .banner{background:var(--orange)}.world.w6 .banner{background:#C9B8FF}
 .world.locked .banner{background:var(--off)}
 .trail{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px 8px;padding:22px 18px 20px;position:relative}
 .trail::before{content:"";position:absolute;left:80px;right:80px;top:66px;border-top:5px dotted var(--ink);opacity:.3}
@@ -145,7 +147,7 @@ body.modoB .note{transform:none}
 .fb strong{font-size:1.2em}
 .shake{animation:shake .35s}
 @keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
-.combo{background:var(--orange);animation:pop .3s}
+.combo{background:var(--orange);color:var(--ink);animation:pop .3s}
 
 /* resultado, relatório, progresso */
 .center{text-align:center}
@@ -187,7 +189,7 @@ footer{margin-top:36px;color:#fff;font-size:.85em;opacity:.9}
 <div class="wrap">
   <main id="app"></main>
   <noscript>Este jogo precisa de JavaScript ativado no navegador.</noscript>
-  <footer>Dev English Quest. Projeto Edutec, Técnico em Desenvolvimento de Sistemas. NovaByte é uma empresa fictícia criada para o jogo.</footer>
+  <footer>Dev English Quest. Técnico em Desenvolvimento de Sistemas, Firjan SENAI Petrópolis. NovaByte é uma empresa fictícia criada para o jogo.</footer>
 </div>
 <script>
 "use strict";
@@ -195,10 +197,13 @@ footer{margin-top:36px;color:#fff;font-size:.85em;opacity:.9}
    CONFIGURAÇÃO DA PROFESSORA
    1) ENDPOINT_URL: cole aqui a URL do App da Web do Apps Script (termina em /exec).
    2) FORMA_TESTE: 1 = teste do início do período; 2 = teste do fim do período.
+   3) CHAVE_PROFESSORA: palavra que abre o modo professora quando colocada no fim do endereço,
+      depois de um ponto de interrogação. Exemplo: .../dev-english-quest/?prof
    ===================================================================== */
 const CONFIG = {
   ENDPOINT_URL: "https://script.google.com/macros/s/AKfycbyMrMoPIXJ1HIZhdIHA-eII058bxUma58sYV4Txs8CSqQ6tbqlVztb5vBtDguIRgvPx/exec",
-  FORMA_TESTE: 1
+  FORMA_TESTE: 1,
+  CHAVE_PROFESSORA: "prof"
 };
 /* Faixas do teste, pelo percentual de acertos (ajuste se quiser). */
 const BANDS = [
@@ -385,7 +390,235 @@ const WORLDS = [
  ]}
 ]}
 ];
-const COMING = ["Mundo 3: Code and docs", "Mundo 4: Support tickets", "Mundo 5: Team chat", "Mundo 6: Job ready"];
+/* ============================ MUNDOS 3 A 6 ============================ */
+const REVIEW = "Maya: Nice work! Two things before we merge:\n1) Rename the variable \"x\" to \"userCount\".\n2) Add a comment to explain the loop.\nAfter that, push your changes again.";
+const BUG = "Steps to reproduce:\n1. Open the app.\n2. Go to Settings.\n3. Click \"Change photo\".\nExpected result: the gallery opens.\nActual result: the app closes.";
+const QUEUE = "Ticket #305 - Priority: HIGH - Status: Open\nFrom: Daniel (client)\nSince this morning, nobody in my company can open the sales report. The page shows \"500 Internal Server Error\". We need the report for a meeting at 3 p.m. today.";
+const STAND = "Daily standup\nLucas: Yesterday I finished the login page. Today I am working on the search feature. I have no blockers.";
+const MAIL = "Subject: Meeting moved to Thursday\nHi team,\nThe meeting is now on Thursday at 10 a.m. Please find the new schedule attached.\nRegards,\nMaya";
+const SPRINT = "Maya: Hi team! Plan for this week:\nMonday: Lucas will fix the login bug.\nWednesday: Ana is going to test the new search.\nFriday: we will deploy version 2.0.\nCould you all update your tasks by Thursday? Thanks!";
+const README1 = "## Requirements\n- Python 3.10 or higher\n- MySQL 8\n\n## Installation\n1. Clone the repository.\n2. Run: pip install -r requirements.txt";
+const JOB = "Junior Web Developer (Remote)\nRequirements:\n- Basic knowledge of HTML, CSS and JavaScript\n- Good communication in English\nNice to have: experience with Git\nApply by June 30.";
+const DREAM = "Subject: Interview invitation\nDear candidate,\nThank you for applying for the Junior Developer internship at NovaByte. We would like to invite you to an online interview on Tuesday at 2 p.m. Please confirm by e-mail.\nBest regards,\nHR Team";
+WORLDS.push(
+{id:3, name:"Code and docs", role:"Junior Developer (desenvolvedor júnior)", desc:"Agora você escreve código: nomes em inglês, documentação, commits e comentários.", phases:[
+ {id:"3.1", ic:"code", name:"Name it right", intro:{en:"Good code speaks English. Let's choose clear names for variables and functions.", pt:"Nomes de variáveis e funções em inglês."}, items:[
+  {t:"match", q:"Ligue cada verbo usado em nomes de funções à tradução.", pairs:[["get","obter"],["set","definir"],["add","adicionar"],["remove","remover"],["update","atualizar"]]},
+  {q:"Qual nome em inglês descreve melhor uma variável que guarda o nome do usuário?", o:["userName","useName","userNote","userNumber"], e:"User = usuário, name = nome. Em inglês, a palavra principal vem por último: userName.", c:["userName","nome do usuário"], h:"Name = nome."},
+  {q:"O que essa variável guarda?", k:"code", ctx:"let totalPrice = 150;", o:["O preço total","O prazo total","O primeiro preço","O total de produtos"], e:"Price = preço. totalPrice = preço total.", c:["price","preço"]},
+  {q:"O que essa função provavelmente faz?", k:"code", ctx:"function getUserEmail() { ... }", o:["Obtém o e-mail do usuário","Apaga o e-mail do usuário","Cria um novo usuário","Envia um e-mail ao usuário"], e:"Get = obter. getUserEmail = obter o e-mail do usuário.", c:["get","obter"], h:"Get = obter, pegar."},
+  {t:"type", q:"Digite em inglês: \"atualizar\"", ans:["update"], e:"Update = atualizar. Exemplo: updateUser().", c:["update","atualizar"]},
+  {q:"Nomes que começam com \"is\" costumam guardar:", k:"code", ctx:"let isLoggedIn = true;", o:["verdadeiro ou falso","um número","um texto longo","uma lista"], e:"\"Is\" = é, está. isLoggedIn responde sim ou não: o usuário está conectado?", c:["isLoggedIn","está conectado (verdadeiro ou falso)"]},
+  {t:"order", q:"Monte a frase: \"Esta função retorna o preço total.\"", w:["This","function","returns","the","total","price"], e:"Returns = retorna, devolve.", c:["returns","retorna"]},
+  {t:"spot", q:"A descrição da função addUser() tem uma palavra errada. Clique nela.", w:["The","function","addUser","removes","a","new","user."], a:3, e:"Add = adicionar. O certo é: \"The function addUser adds a new user.\"", c:["add","adicionar"]}
+ ]},
+ {id:"3.2", ic:"book", name:"Read the docs", intro:{en:"Nobody knows everything. Good developers read the documentation.", pt:"Palavras que aparecem em toda documentação."}, items:[
+  {t:"match", q:"Ligue cada termo de documentação à tradução.", pairs:[["parameter","parâmetro"],["required","obrigatório"],["optional","opcional"],["default","padrão"],["returns","retorna"]]},
+  {q:"O que len() devolve?", k:"code", ctx:"len(s)\nReturn the length (the number of items) of an object.", o:["O número de itens de um objeto","O maior item do objeto","O nome do objeto","O tipo do objeto"], e:"Length = comprimento, tamanho. \"The number of items\" = o número de itens.", c:["length","comprimento / tamanho"], h:"Number of items = número de itens."},
+  {q:"Se você não informar o timeout, qual valor será usado?", k:"code", ctx:"timeout (optional): time in seconds. Default: 30.", o:["30 segundos","0 segundos","3 segundos","Nenhum; dá erro"], e:"Default = valor padrão, usado quando você não informa outro.", c:["default","padrão"]},
+  {q:"\"Required\" indica que o parâmetro é:", k:"code", ctx:"name (required): the name of the file.", o:["obrigatório","numérico","opcional","secreto"], e:"Required = obrigatório. Optional = opcional.", c:["required","obrigatório"]},
+  {t:"type", q:"Digite em inglês: \"exemplo\"", ans:["example"], e:"Example = exemplo. Procure sempre a seção \"Examples\" da documentação.", c:["example","exemplo"]},
+  {q:"O que a documentação recomenda?", ctx:"Warning: This method is deprecated. Use fetchData() instead.", o:["Usar fetchData() no lugar do método antigo","Apagar fetchData()","Continuar usando o método antigo","Esperar a próxima versão"], e:"Deprecated = obsoleto, não use mais. Instead = no lugar.", c:["deprecated","obsoleto (não use mais)"], h:"Instead = no lugar, em vez disso."},
+  {q:"\"See also\" significa:", k:"code", ctx:"See also: Installation guide", o:["veja também","não veja","veja antes","veja só"], e:"See = ver. Also = também.", c:["see also","veja também"]},
+  {t:"order", q:"Monte a frase: \"Leia a documentação antes de começar.\"", w:["Read","the","documentation","before","you","start"], e:"Before = antes. After = depois.", c:["before","antes"]}
+ ]},
+ {id:"3.3", ic:"branch", name:"Commit messages", intro:{en:"Every change needs a clear message. Start with a verb: Add, Fix, Update, Remove.", pt:"Mensagens de commit e comandos do Git."}, items:[
+  {t:"match", q:"Ligue cada verbo de commit à tradução.", pairs:[["Add","Adicionar"],["Fix","Corrigir"],["Update","Atualizar"],["Remove","Remover"],["Rename","Renomear"]]},
+  {q:"Você corrigiu um erro no formulário de login. Qual é a melhor mensagem de commit?", o:["Fix error in login form","Add new login form","Remove login form","Update README"], e:"Fix = corrigir. A mensagem diz o que a alteração faz.", c:["fix","corrigir"]},
+  {q:"Você criou uma página nova de contato. Qual é a melhor mensagem de commit?", o:["Add contact page","Delete contact page","Fix contact page","Rename contact page"], e:"Add = adicionar. A página não existia antes."},
+  {q:"O que o comando \"push\" faz?", k:"code", ctx:"$ git push origin main", o:["Envia os commits para o repositório remoto","Apaga o último commit","Baixa os commits do repositório remoto","Cria uma nova branch"], e:"Push = empurrar. Você envia o seu trabalho para o repositório remoto.", c:["push","enviar (para o repositório remoto)"], h:"Push = empurrar."},
+  {q:"O que o comando \"pull\" faz?", k:"code", ctx:"$ git pull", o:["Traz as alterações do repositório remoto","Desfaz as alterações locais","Envia as alterações para o remoto","Mostra o histórico"], e:"Pull = puxar. Você traz o trabalho dos colegas para o seu computador.", c:["pull","trazer (do repositório remoto)"], h:"Pull = puxar."},
+  {t:"type", q:"Digite em inglês: \"corrigir\" (um bug)", ans:["fix"], e:"Fix = corrigir. Bugfix = correção de bug.", c:["fix","corrigir"]},
+  {t:"order", q:"Monte a mensagem de commit: \"Atualiza o texto da página inicial\"", w:["Update","text","on","the","home","page"], e:"Home page = página inicial.", c:["home page","página inicial"]},
+  {t:"spot", q:"A mensagem de commit tem uma palavra errada. Clique nela.", w:["Add","typo","in","the","README","file"], a:0, e:"Typo = erro de digitação. Ninguém adiciona um erro: o certo é \"Fix typo in the README file\".", c:["typo","erro de digitação"]}
+ ]},
+ {id:"3.4", ic:"pencil", name:"Comments and TODOs", intro:{en:"Comments explain the code to other people. Let's read some.", pt:"Comentários dentro do código."}, items:[
+  {q:"O que esse comentário indica?", k:"code", ctx:"// TODO: add error handling", o:["Uma tarefa que ainda precisa ser feita","Um erro que foi corrigido","Um trecho que deve ser apagado","Uma tarefa já concluída"], e:"TODO vem de \"to do\" = a fazer.", c:["TODO","a fazer"]},
+  {q:"O comentário pede para:", k:"code", ctx:"# Do not change this value", o:["não alterar o valor","alterar o valor","apagar o valor","copiar o valor"], e:"\"Do not\" = não faça. Change = alterar. Value = valor.", c:["value","valor"], h:"Change = mudar, alterar."},
+  {t:"match", q:"Ligue cada palavra de programação à tradução.", pairs:[["comment","comentário"],["line","linha"],["loop","laço de repetição"],["array","vetor (lista)"],["string","texto"]]},
+  {q:"\"Temporary\" indica que a correção é:", k:"code", ctx:"// This is a temporary fix", o:["provisória","automática","definitiva","perigosa"], e:"Temporary = temporário. A correção definitiva ainda será feita.", c:["temporary","temporário / provisório"]},
+  {t:"type", q:"Digite em inglês: \"linha\" (de código)", ans:["line"], e:"Line = linha. \"Error on line 12\" = erro na linha 12.", c:["line","linha"]},
+  {q:"Qual é o problema apontado?", k:"code", ctx:"# FIXME: this loop never ends", o:["O laço nunca termina","O laço foi apagado","O laço nunca começa","O laço termina cedo demais"], e:"Never = nunca. Ends = termina. FIXME = corrija-me.", c:["never","nunca"]},
+  {t:"order", q:"Monte o comentário: \"Verifica se o usuário está conectado\"", w:["Check","if","the","user","is","logged","in"], e:"Check if = verifica se. Logged in = conectado.", c:["check","verificar"]},
+  {q:"Quando a função devolve true?", k:"code", ctx:"/* Returns true if the password is valid */", o:["Quando a senha é válida","Quando a senha é alterada","Quando a senha é inválida","Quando a senha está vazia"], e:"\"If the password is valid\" = se a senha for válida.", c:["valid","válido(a)"]}
+ ]},
+ {id:"3.B", ic:"eye", name:"Desafio: Code review", boss:true, intro:{en:"I reviewed your pull request. Read my comments and finish the job!", pt:"Desafio final do Mundo 3: revisão de código."}, items:[
+  {q:"Maya aprovou o trabalho de primeira?", ctx:REVIEW, o:["Não, ela pediu duas alterações antes","Não, ela pediu para refazer tudo","Sim, e já fez o merge","Sim, sem alterações"], e:"\"Two things before we merge\" = duas coisas antes de unirmos o código."},
+  {q:"O que fazer com a variável x?", ctx:REVIEW, o:["Renomear para userCount","Apagar","Mudar o valor","Transformar em comentário"], e:"\"Rename the variable\" = renomeie a variável. Count = contagem.", c:["userCount","contagem de usuários"]},
+  {q:"Para que serve o comentário pedido?", ctx:REVIEW, o:["Para explicar o laço","Para apagar o laço","Para repetir o laço","Para testar o laço"], e:"Explain = explicar. Loop = laço de repetição.", c:["explain","explicar"]},
+  {q:"O que fazer depois das alterações?", ctx:REVIEW, o:["Enviar as alterações de novo","Apagar a branch","Criar outro repositório","Esperar a Maya enviar"], e:"\"Push your changes again\" = envie as suas alterações de novo."},
+  {q:"\"Merge\" significa:", k:"code", ctx:"$ git merge feature/login", o:["unir duas branches","apagar uma branch","copiar um repositório","renomear uma branch"], e:"Merge = unir, mesclar. O código de uma branch entra em outra.", c:["merge","unir / mesclar"]},
+  {t:"order", q:"Monte a mensagem de commit: \"Renomeia variável e adiciona comentário\"", w:["Rename","variable","and","add","comment"], e:"Mensagens de commit começam com o verbo."},
+  {t:"type", q:"Digite em inglês: \"obrigatório\" (parâmetro)", ans:["required"], e:"Required = obrigatório.", c:["required","obrigatório"]},
+  {t:"spot", q:"O comentário descreve a função calculateTotal(), mas tem uma palavra errada. Clique nela.", w:["Deletes","the","total","price","of","the","order."], a:0, e:"Calculate = calcular. O certo é: \"Calculates the total price of the order.\"", c:["order","pedido"]},
+  {t:"match", q:"Ligue cada termo do Git à tradução.", pairs:[["branch","ramificação"],["merge","unir"],["push","enviar"],["pull","trazer"],["commit","registrar alterações"]]},
+  {q:"O que acontece com a lista original?", k:"code", ctx:"sorted(list)\nReturn a new sorted list. The original list is not changed.", o:["Ela não é alterada","Ela é apagada","Ela é ordenada também","Ela fica vazia"], e:"\"Is not changed\" = não é alterada. Sorted = ordenado(a).", c:["sorted","ordenado(a)"]}
+ ]}
+]},
+{id:4, name:"Support tickets", role:"Mid-level Developer (desenvolvedor pleno)", desc:"Clientes do mundo todo pedem ajuda: entenda o problema, pergunte e responda.", phases:[
+ {id:"4.1", ic:"question", name:"What happened?", intro:{en:"Clients write to tell us what happened. Listen to the past!", pt:"Verbos no passado e palavras de pergunta."}, items:[
+  {t:"match", q:"Ligue cada verbo no passado à tradução.", pairs:[["stopped","parou"],["crashed","travou (fechou sozinho)"],["tried","tentei"],["clicked","cliquei"],["worked","funcionou"]]},
+  {q:"Quando o aplicativo travou?", ctx:"Ticket #210\nThe app crashed when I opened the camera.", o:["Quando o usuário abriu a câmera","Quando o usuário fechou a câmera","Quando o usuário instalou o app","Quando o usuário tirou uma foto"], e:"Crashed = travou, fechou sozinho. Opened = abriu.", c:["crashed","travou / fechou sozinho"]},
+  {q:"Qual é a situação?", ctx:"It worked yesterday, but today it doesn't work.", o:["Funcionava ontem e hoje não funciona","Funciona hoje, mas ontem não","Nunca funcionou","Vai funcionar amanhã"], e:"Worked = funcionou (passado). \"Doesn't work\" = não funciona (presente).", c:["yesterday","ontem"], h:"Yesterday = ontem. Today = hoje."},
+  {q:"Complete a frase.", ctx:"I ___ the button, but nothing happened.", o:["clicked","click","clicking","clicks"], e:"A ação já aconteceu, então o verbo vai para o passado: clicked. \"Nothing happened\" = nada aconteceu.", c:["nothing happened","nada aconteceu"]},
+  {t:"type", q:"Digite em inglês: \"ontem\"", ans:["yesterday"], e:"Yesterday = ontem. Today = hoje. Tomorrow = amanhã.", c:["yesterday","ontem"]},
+  {t:"match", q:"Ligue cada palavra de pergunta à tradução.", pairs:[["What","O quê"],["When","Quando"],["Where","Onde"],["Why","Por quê"],["How","Como"]]},
+  {t:"order", q:"Monte a pergunta: \"Quando o problema começou?\"", w:["When","did","the","problem","start"], e:"Em perguntas no passado, usamos did + verbo na forma simples: \"did ... start\".", c:["When did it start?","Quando começou?"]},
+  {t:"spot", q:"A frase conta algo que já aconteceu, mas um verbo está errado. Clique nele.", w:["Yesterday","I","try","to","log","in","three","times."], a:2, e:"Com yesterday, o verbo vai para o passado: \"Yesterday I tried to log in\".", c:["tried","tentei"]}
+ ]},
+ {id:"4.2", ic:"list", name:"Steps to reproduce", intro:{en:"To fix a bug, we need to see it. A good bug report shows the steps.", pt:"Como ler um relato de bug."}, items:[
+  {t:"match", q:"Ligue cada palavra de sequência à tradução.", pairs:[["first","primeiro"],["then","depois"],["after that","depois disso"],["finally","por fim"],["again","de novo"]]},
+  {q:"O que deveria acontecer?", ctx:BUG, o:["A galeria deveria abrir","A foto deveria ser apagada","As configurações deveriam abrir","O aplicativo deveria fechar"], e:"Expected result = resultado esperado.", c:["expected result","resultado esperado"]},
+  {q:"O que acontece de verdade?", ctx:BUG, o:["O aplicativo fecha","A foto muda","A galeria abre","Nada acontece"], e:"Cuidado: actual não é \"atual\". Actual = real, de verdade.", c:["actual result","resultado obtido (real)"]},
+  {q:"Em qual passo o erro aparece?", ctx:BUG, o:["No passo 3","Antes do passo 1","No passo 1","No passo 2"], e:"O aplicativo fecha depois de clicar em \"Change photo\", que é o passo 3."},
+  {q:"\"Steps to reproduce\" são:", o:["os passos para repetir o erro","as soluções do erro","os nomes dos usuários","os passos para instalar o app"], e:"Step = passo. Reproduce = reproduzir, fazer acontecer de novo.", c:["steps to reproduce","passos para reproduzir o erro"]},
+  {t:"type", q:"Digite em inglês: \"passo\" (etapa)", ans:["step"], e:"Step = passo. \"Step by step\" = passo a passo.", c:["step","passo"]},
+  {t:"order", q:"Monte a instrução: \"Depois, clique no botão salvar.\"", w:["Then","click","the","save","button"], e:"Then = depois, em seguida."},
+  {q:"Com que frequência o erro acontece?", ctx:"The error happens every time I open the page.", o:["Sempre que a página é aberta","Às vezes","Nunca","Só na primeira vez"], e:"Every time = toda vez.", c:["every time","toda vez"]}
+ ]},
+ {id:"4.3", ic:"headset", name:"Asking the user", intro:{en:"Sometimes the ticket is not clear. Ask good questions!", pt:"Perguntas para entender o problema do cliente."}, items:[
+  {q:"O cliente escreveu só \"The app is not working\". Qual pergunta ajuda mais?", o:["What error message do you see?","Do you like the app?","How old are you?","Where do you live?"], e:"\"What error message do you see?\" = qual mensagem de erro você vê?", c:["error message","mensagem de erro"]},
+  {t:"match", q:"Ligue cada palavra à tradução.", pairs:[["screenshot","captura de tela"],["version","versão"],["device","dispositivo"],["browser","navegador"],["account","conta"]]},
+  {q:"O suporte quer saber:", ctx:"Which browser are you using?", o:["qual navegador o cliente usa","qual computador o cliente comprou","qual senha o cliente usa","qual site o cliente visitou"], e:"Which = qual. Browser = navegador (Chrome, Edge, Firefox).", c:["browser","navegador"]},
+  {q:"Complete a pergunta.", ctx:"___ did the problem start?\nLast Monday.", o:["When","What","Where","Who"], e:"A resposta é uma data (last Monday), então a pergunta começa com When.", c:["last Monday","segunda-feira passada"]},
+  {t:"order", q:"Monte o pedido: \"Você pode enviar uma captura de tela?\"", w:["Can","you","send","a","screenshot"], e:"\"Can you...?\" = você pode...?", c:["screenshot","captura de tela"]},
+  {t:"type", q:"Digite em inglês: \"navegador\"", ans:["browser"], e:"Browser = navegador.", c:["browser","navegador"]},
+  {q:"O suporte pergunta se o cliente:", ctx:"Have you tried restarting the computer?", o:["já tentou reiniciar o computador","desligou o computador ontem","quer comprar outro computador","sabe usar o computador"], e:"\"Have you tried...?\" = você já tentou...? Restart = reiniciar.", c:["Have you tried...?","Você já tentou...?"]},
+  {t:"spot", q:"A resposta foi \"Last week\". A pergunta tem uma palavra errada. Clique nela.", w:["Where","did","the","problem","start?"], a:0, e:"\"Last week\" responde quando, não onde: \"When did the problem start?\""}
+ ]},
+ {id:"4.4", ic:"mail", name:"Reply to the client", intro:{en:"A good answer is clear and polite. Let's write to the client.", pt:"Frases educadas para responder ao cliente."}, items:[
+  {t:"match", q:"Ligue cada frase à tradução.", pairs:[["Thank you for contacting us","Obrigado por entrar em contato"],["We are sorry","Pedimos desculpas"],["We are working on it","Estamos trabalhando nisso"],["Please let us know","Por favor, nos avise"],["Best regards","Atenciosamente"]]},
+  {q:"Qual é a melhor forma de começar a resposta a um cliente?", o:["Hello Sarah, thank you for contacting us.","Hey, wait.","Sarah, you are wrong.","What do you want?"], e:"Começamos com um cumprimento e um agradecimento."},
+  {q:"O que o cliente deve fazer?", ctx:"Hello! The problem was fixed in version 2.1. Please update your app.", o:["Atualizar o aplicativo","Apagar o aplicativo","Enviar outro chamado","Esperar a versão 2.1"], e:"\"Was fixed\" = foi corrigido. \"Please update your app\" = por favor, atualize o aplicativo.", c:["was fixed","foi corrigido"]},
+  {q:"Complete a frase.", ctx:"We are sorry ___ the problem.", o:["for","at","of","to"], e:"Sorry for = desculpe por.", c:["sorry for","desculpe por"]},
+  {t:"order", q:"Monte a frase: \"Estamos trabalhando em uma solução.\"", w:["We","are","working","on","a","solution"], e:"\"Working on\" = trabalhando em.", c:["solution","solução"]},
+  {t:"type", q:"Digite em inglês: \"solução\"", ans:["solution"], e:"Solution = solução. Solve = resolver.", c:["solution","solução"]},
+  {q:"O suporte pede que o cliente:", ctx:"Please let us know if the problem happens again.", o:["avise se o problema acontecer de novo","espere o problema acontecer","não escreva mais","resolva o problema sozinho"], e:"\"Let us know\" = nos avise. Again = de novo.", c:["let us know","nos avise"]},
+  {q:"Para encerrar um e-mail profissional, usamos:", o:["Best regards,","Bye bye,","See ya,","The end,"], e:"\"Best regards\" = atenciosamente. As outras opções são informais demais.", c:["Best regards","Atenciosamente"]}
+ ]},
+ {id:"4.B", ic:"ticket", name:"Desafio: Ticket queue", boss:true, intro:{en:"A high priority ticket just arrived. The client is counting on you!", pt:"Desafio final do Mundo 4: um chamado urgente."}, items:[
+  {q:"Qual é a prioridade do chamado?", ctx:QUEUE, o:["Alta","Baixa","Média","Sem prioridade"], e:"Priority: HIGH = prioridade alta.", c:["priority","prioridade"]},
+  {q:"Quem é afetado pelo problema?", ctx:QUEUE, o:["Todos da empresa do cliente","Ninguém ainda","Só a equipe de suporte","Só o Daniel"], e:"\"Nobody in my company can open\" = ninguém na minha empresa consegue abrir.", c:["nobody","ninguém"]},
+  {q:"Desde quando o problema acontece?", ctx:QUEUE, o:["Desde hoje de manhã","Desde a semana passada","Desde as 15h","Desde ontem"], e:"\"Since this morning\" = desde hoje de manhã.", c:["since","desde"]},
+  {q:"Por que o chamado é urgente?", ctx:QUEUE, o:["O relatório é necessário para uma reunião hoje às 15h","O cliente vai viajar amanhã","O relatório será apagado hoje","O servidor será desligado às 15h"], e:"\"We need the report for a meeting at 3 p.m. today.\" Meeting = reunião.", c:["meeting","reunião"]},
+  {t:"match", q:"Ligue cada termo do chamado à tradução.", pairs:[["open","aberto"],["in progress","em andamento"],["closed","encerrado"],["high","alta"],["low","baixa"]]},
+  {t:"order", q:"Monte a resposta: \"Estamos investigando o problema agora.\"", w:["We","are","investigating","the","problem","now"], e:"Investigating = investigando."},
+  {q:"Qual pergunta faz sentido enviar ao Daniel?", o:["Does the error happen in other reports too?","Can you close the company?","Did you write the report?","What is your favorite report?"], e:"Saber se o erro acontece em outros relatórios ajuda a encontrar a causa."},
+  {t:"type", q:"Digite em inglês: \"reunião\"", ans:["meeting"], e:"Meeting = reunião.", c:["meeting","reunião"]},
+  {t:"spot", q:"A resposta ao cliente tem uma palavra errada. Clique nela.", w:["The","problem","was","fixed.","Please","try","to","close","the","report","again."], a:7, e:"O cliente quer abrir o relatório: \"Please try to open the report again.\""},
+  {q:"Qual é a situação final?", ctx:"Ticket #305 - Status: Closed\nThe server was restarted and the report is available again.", o:["O chamado foi encerrado e o relatório voltou a funcionar","O chamado continua aberto","O relatório foi apagado","O servidor continua fora do ar"], e:"Closed = encerrado. Available = disponível.", c:["available","disponível"]}
+ ]}
+]},
+{id:5, name:"Team chat", role:"Senior Developer (desenvolvedor sênior)", desc:"Trabalho em equipe: reunião diária, pedidos educados, prazos e e-mails.", phases:[
+ {id:"5.1", ic:"people", name:"Daily standup", intro:{en:"Every morning the team has a short meeting. Tell us what you are doing.", pt:"A reunião diária da equipe."}, items:[
+  {q:"O que Lucas fez ontem?", ctx:STAND, o:["Terminou a página de login","Começou a busca","Corrigiu um impedimento","Testou a busca"], e:"\"Yesterday I finished the login page.\" Finished = terminei."},
+  {q:"No que Lucas está trabalhando hoje?", ctx:STAND, o:["Na funcionalidade de busca","Em nada","Em um impedimento","Na página de login"], e:"\"I am working on\" = estou trabalhando em. Feature = funcionalidade.", c:["feature","funcionalidade"]},
+  {q:"\"I have no blockers\" significa que:", ctx:STAND, o:["nada está impedindo o trabalho dele","ele bloqueou o sistema","ele não tem computador","ele não tem tarefas"], e:"Blocker = impedimento, algo que trava o trabalho.", c:["blocker","impedimento"]},
+  {q:"Complete a frase.", ctx:"Right now, I ___ the database.", o:["am testing","test","tested","testing"], e:"Para algo que está acontecendo agora: am/is/are + verbo com -ing.", c:["right now","agora mesmo"]},
+  {t:"match", q:"Ligue cada expressão de tempo à tradução.", pairs:[["yesterday","ontem"],["today","hoje"],["tomorrow","amanhã"],["right now","agora mesmo"],["this week","esta semana"]]},
+  {t:"order", q:"Monte a frase: \"Hoje eu estou corrigindo um bug.\"", w:["Today","I","am","fixing","a","bug"], e:"\"I am fixing\" = estou corrigindo."},
+  {t:"type", q:"Digite em inglês: \"amanhã\"", ans:["tomorrow"], e:"Tomorrow = amanhã.", c:["tomorrow","amanhã"]},
+  {t:"spot", q:"A frase fala de algo que acontece agora, mas um verbo está errado. Clique nele.", w:["Right","now","we","are","test","the","new","feature."], a:4, e:"Depois de \"are\", o verbo ganha -ing: \"we are testing the new feature\"."}
+ ]},
+ {id:"5.2", ic:"chat", name:"Could you...?", intro:{en:"Asking for help is part of the job. Ask nicely!", pt:"Pedidos educados e como responder."}, items:[
+  {t:"match", q:"Ligue cada frase à tradução.", pairs:[["Could you help me?","Você poderia me ajudar?"],["Sure!","Claro!"],["I'm busy right now","Estou ocupado(a) agora"],["No problem","Sem problema"],["Thanks a lot","Muito obrigado(a)"]]},
+  {q:"Qual pedido é mais educado?", o:["Could you review my code, please?","Review my code.","Why don't you review my code?","You must review my code now."], e:"\"Could you..., please?\" é a forma educada de pedir.", c:["Could you...?","Você poderia...?"]},
+  {q:"Até quando você deve enviar o relatório?", ctx:"Maya: Could you send me the report by 5 p.m.?", o:["Até as 17h","Às 5h da manhã","Depois das 17h","Em 5 horas"], e:"\"By 5 p.m.\" = até as 17h. p.m. indica tarde ou noite.", c:["by 5 p.m.","até as 17h"]},
+  {q:"Você não pode ajudar agora. Qual resposta é educada?", o:["Sorry, I'm busy right now. Can I help you later?","I don't like your code.","No.","That is not my job."], e:"Explique o motivo e ofereça outra hora. Later = mais tarde.", c:["later","mais tarde"]},
+  {q:"ASAP significa:", ctx:"Please fix this ASAP.", o:["o mais rápido possível","depois do almoço","quando você quiser","só amanhã"], e:"ASAP = as soon as possible.", c:["ASAP (as soon as possible)","o mais rápido possível"]},
+  {t:"order", q:"Monte o pedido: \"Você poderia me ajudar com este erro?\"", w:["Could","you","help","me","with","this","error"], e:"\"Help me with\" = me ajudar com."},
+  {t:"type", q:"Digite em inglês: \"ocupado\"", ans:["busy"], e:"Busy = ocupado(a).", c:["busy","ocupado(a)"]},
+  {q:"A pessoa que escreveu a mensagem está:", ctx:"Would you mind checking my pull request?", o:["pedindo com educação que você confira o pull request","perguntando o que é um pull request","reclamando do seu pull request","recusando o seu pull request"], e:"\"Would you mind...?\" = você se importaria de...? É um pedido bem educado.", c:["Would you mind...?","Você se importaria de...?"]}
+ ]},
+ {id:"5.3", ic:"calendar", name:"Plans and deadlines", intro:{en:"Projects have dates. Let's talk about the future.", pt:"Planos, prazos e futuro."}, items:[
+  {t:"match", q:"Ligue cada palavra à tradução.", pairs:[["deadline","prazo final"],["schedule","cronograma"],["on time","no prazo"],["late","atrasado(a)"],["next week","semana que vem"]]},
+  {q:"O que acontece na segunda-feira?", ctx:"Maya: The deadline is Friday. We will deploy the new version on Monday.", o:["A nova versão será publicada","A equipe entra de férias","A versão antiga será apagada","O prazo termina"], e:"\"We will deploy\" = vamos publicar. Deploy = colocar no ar.", c:["deploy","publicar (colocar no ar)"]},
+  {q:"Complete a frase.", ctx:"Tomorrow we ___ test the new feature.", o:["will","are","did","was"], e:"Will + verbo indica futuro: \"we will test\"."},
+  {q:"A pessoa que escreveu a frase:", ctx:"I'm going to finish the report this afternoon.", o:["pretende terminar o relatório hoje à tarde","está terminando o relatório agora","não vai terminar o relatório","terminou o relatório de manhã"], e:"\"Going to\" indica um plano para o futuro. This afternoon = hoje à tarde.", c:["going to","vou / vai (plano)"]},
+  {q:"O projeto está:", ctx:"The project is two days late.", o:["dois dias atrasado","dois dias adiantado","parado há dois dias","pronto há dois dias"], e:"Late = atrasado.", c:["late","atrasado(a)"]},
+  {t:"order", q:"Monte a frase: \"Nós vamos terminar no prazo.\"", w:["We","will","finish","on","time"], e:"On time = no prazo, na hora certa.", c:["on time","no prazo"]},
+  {t:"type", q:"Digite em inglês: \"prazo final\" (uma palavra só)", ans:["deadline"], e:"Deadline = prazo final.", c:["deadline","prazo final"]},
+  {t:"spot", q:"A frase fala do futuro, mas um verbo está errado. Clique nele.", w:["The","deadline","was","next","Friday."], a:2, e:"\"Next Friday\" é futuro: \"The deadline is next Friday.\""}
+ ]},
+ {id:"5.4", ic:"mail", name:"E-mails that work", intro:{en:"A clear e-mail saves everybody's time.", pt:"Como ler e escrever e-mails de trabalho."}, items:[
+  {t:"match", q:"Ligue cada palavra de e-mail à tradução.", pairs:[["subject","assunto"],["attached","em anexo"],["regards","saudações"],["reply","responder"],["forward","encaminhar"]]},
+  {q:"Sobre o que é o e-mail?", ctx:MAIL, o:["A reunião mudou para quinta-feira","A equipe ganhou folga na quinta","A reunião foi cancelada","A reunião será na terça às 10h"], e:"\"Meeting moved to Thursday\" = reunião transferida para quinta-feira.", c:["moved","transferido(a)"]},
+  {q:"O que vai em anexo?", ctx:MAIL, o:["O novo cronograma","A ata da reunião","O código do projeto","O relatório de vendas"], e:"\"Please find the new schedule attached\" = segue o novo cronograma em anexo.", c:["schedule","cronograma"]},
+  {q:"FYI no início de uma mensagem significa:", o:["para sua informação","faça agora","não leia","responda hoje"], e:"FYI = for your information.", c:["FYI (for your information)","para sua informação"]},
+  {q:"Qual assunto de e-mail é mais claro?", o:["Error in sales report - need help today","Hi","Problem!!!","Question"], e:"Um bom assunto diz qual é o tema e o que você precisa."},
+  {t:"order", q:"Monte a frase: \"Segue o relatório em anexo.\"", w:["Please","find","the","report","attached"], e:"\"Please find ... attached\" é a forma padrão de avisar que há um anexo.", c:["attached","em anexo"]},
+  {t:"type", q:"Digite em inglês: \"assunto\" (do e-mail)", ans:["subject"], e:"Subject = assunto.", c:["subject","assunto"]},
+  {q:"Complete a frase.", ctx:"I look forward ___ your reply.", o:["to","at","for","on"], e:"\"I look forward to your reply\" = aguardo a sua resposta.", c:["I look forward to your reply","Aguardo a sua resposta"]}
+ ]},
+ {id:"5.B", ic:"bolt", name:"Desafio: Sprint week", boss:true, intro:{en:"Big week! Read the plan and help the team deliver.", pt:"Desafio final do Mundo 5: a semana da entrega."}, items:[
+  {q:"Quem vai corrigir o bug de login?", ctx:SPRINT, o:["Lucas","A equipe toda","Ana","Maya"], e:"\"Lucas will fix the login bug.\""},
+  {q:"O que acontece na quarta-feira?", ctx:SPRINT, o:["Ana vai testar a nova busca","A equipe atualiza as tarefas","Lucas vai publicar a versão","Maya vai corrigir o login"], e:"Wednesday = quarta-feira. \"Ana is going to test the new search.\""},
+  {q:"Até quando a equipe deve atualizar as tarefas?", ctx:SPRINT, o:["Até quinta-feira","Até quarta-feira","Até segunda-feira","Até sexta-feira"], e:"\"By Thursday\" = até quinta-feira.", c:["by Thursday","até quinta-feira"]},
+  {q:"O que será publicado na sexta-feira?", ctx:SPRINT, o:["A versão 2.0","A nova equipe","O bug de login","O plano da semana"], e:"\"We will deploy version 2.0\" = vamos publicar a versão 2.0."},
+  {t:"order", q:"Monte a resposta: \"Vou atualizar minhas tarefas hoje.\"", w:["I","will","update","my","tasks","today"], e:"Task = tarefa.", c:["task","tarefa"]},
+  {q:"Você está atrasado com uma tarefa. Qual mensagem é mais profissional?", o:["I'm sorry, I need one more day to finish the task.","I don't care about the deadline.","Maybe next month.","The task is boring."], e:"Avise a equipe e diga de quanto tempo você precisa."},
+  {t:"type", q:"Digite em inglês: \"tarefa\"", ans:["task"], e:"Task = tarefa.", c:["task","tarefa"]},
+  {t:"match", q:"Ligue cada dia à tradução.", pairs:[["Monday","segunda-feira"],["Wednesday","quarta-feira"],["Thursday","quinta-feira"],["Friday","sexta-feira"],["weekend","fim de semana"]]},
+  {t:"spot", q:"O pedido tem uma palavra errada. Clique nela.", w:["Could","you","sending","me","the","file,","please?"], a:2, e:"Depois de \"Could you\", o verbo fica na forma simples: \"Could you send me the file, please?\""},
+  {q:"Do que Ana precisa para continuar?", ctx:"Daily standup\nAna: I am blocked. I need access to the test server.", o:["De acesso ao servidor de testes","De ajuda com o login","De mais prazo","De um computador novo"], e:"\"I am blocked\" = estou impedida. \"I need access\" = preciso de acesso.", c:["access","acesso"]}
+ ]}
+]},
+{id:6, name:"Job ready", role:"Tech Lead (líder técnico)", desc:"Hora de olhar para a carreira: README, vagas, perfil profissional e entrevista.", phases:[
+ {id:"6.1", ic:"doc", name:"README first", intro:{en:"Every good project starts with a README. Can you read one?", pt:"As seções de um README."}, items:[
+  {t:"match", q:"Ligue cada seção do README à tradução.", pairs:[["Installation","Instalação"],["Usage","Como usar"],["Requirements","Requisitos"],["License","Licença"],["Contributing","Como contribuir"]]},
+  {q:"Qual versão do Python o projeto exige?", k:"code", ctx:README1, o:["3.10 ou mais recente","3.10 ou mais antiga","Qualquer versão","Somente a 3.10"], e:"\"Or higher\" = ou superior.", c:["or higher","ou superior"]},
+  {q:"Qual é o primeiro passo da instalação?", k:"code", ctx:README1, o:["Clonar o repositório","Criar um usuário","Instalar o MySQL 8","Rodar o pip install"], e:"\"Clone the repository\" = clone o repositório."},
+  {q:"Em qual seção do README você descobre como executar o programa?", o:["Usage","Authors","Contributing","License"], e:"Usage = uso, como usar.", c:["usage","uso / como usar"]},
+  {q:"Essa seção informa:", k:"code", ctx:"## License\nThis project is licensed under the MIT License.", o:["as regras para usar e copiar o projeto","a data de criação do projeto","o autor do projeto","o preço do projeto"], e:"A licença diz o que outras pessoas podem fazer com o código.", c:["license","licença"]},
+  {t:"type", q:"Digite em inglês: \"requisitos\"", ans:["requirements"], e:"Requirements = requisitos.", c:["requirements","requisitos"]},
+  {t:"order", q:"Monte a frase: \"Este projeto é um jogo para praticar inglês.\"", w:["This","project","is","a","game","to","practice","English"], e:"\"To practice\" = para praticar."},
+  {q:"O que fazer antes de enviar um pull request?", k:"code", ctx:"## Contributing\nPull requests are welcome. Please open an issue first.", o:["Abrir uma issue","Apagar o fork","Pagar uma taxa","Pedir a senha"], e:"\"Please open an issue first\" = abra uma issue antes. Issue = registro de problema ou sugestão.", c:["issue","registro de problema ou sugestão"]}
+ ]},
+ {id:"6.2", ic:"briefcase", name:"Job ads", intro:{en:"NovaByte is hiring for the international team. Let's read some job ads.", pt:"Como ler um anúncio de vaga."}, items:[
+  {t:"match", q:"Ligue cada termo de vaga à tradução.", pairs:[["full-time","tempo integral"],["part-time","meio período"],["remote","remoto"],["internship","estágio"],["salary","salário"]]},
+  {q:"Onde a pessoa contratada vai trabalhar?", ctx:JOB, o:["De forma remota","Em outro país","Na casa do cliente","No escritório"], e:"Remote = remoto, a distância."},
+  {q:"O que é obrigatório para a vaga?", ctx:JOB, o:["Conhecimento básico de HTML, CSS e JavaScript","Cinco anos de experiência","Diploma universitário","Experiência com Git"], e:"O que está em Requirements é obrigatório. Knowledge = conhecimento.", c:["knowledge","conhecimento"]},
+  {q:"\"Nice to have\" indica algo que é:", ctx:JOB, o:["desejável, mas não obrigatório","obrigatório","pago à parte","proibido"], e:"Nice to have = é bom ter. Conta pontos, mas não elimina.", c:["nice to have","desejável (diferencial)"]},
+  {q:"Até quando é possível se candidatar?", ctx:JOB, o:["Até 30 de junho","A partir de 30 de junho","Até junho do ano que vem","Só no dia 30 de junho"], e:"\"Apply by June 30\" = candidate-se até 30 de junho.", c:["apply","candidatar-se"]},
+  {t:"type", q:"Digite em inglês: \"estágio\" (vaga para estudantes)", ans:["internship"], e:"Internship = estágio. Intern = estagiário(a).", c:["internship","estágio"]},
+  {q:"\"Skills\" em um anúncio de vaga são:", o:["habilidades","endereços","horários","salários"], e:"Skills = habilidades, o que você sabe fazer.", c:["skills","habilidades"]},
+  {t:"order", q:"Monte a frase: \"Eu gostaria de me candidatar a esta vaga.\"", w:["I","would","like","to","apply","for","this","job"], e:"\"I would like to\" = eu gostaria de. \"Apply for\" = candidatar-se a."}
+ ]},
+ {id:"6.3", ic:"user", name:"Your profile", intro:{en:"Time to talk about you. What can you do?", pt:"Como se apresentar profissionalmente."}, items:[
+  {q:"Qual frase apresenta corretamente um estudante de curso técnico?", o:["I am a student of Systems Development.","I am student to Systems Development.","I student Systems Development.","Me is a student of Systems Development."], e:"\"I am a student of...\" = sou estudante de..."},
+  {t:"match", q:"Ligue cada palavra à tradução.", pairs:[["strength","ponto forte"],["skill","habilidade"],["experience","experiência"],["goal","objetivo"],["teamwork","trabalho em equipe"]]},
+  {q:"Complete a frase.", ctx:"I ___ create web pages with HTML and CSS.", o:["can","am","has","is"], e:"Can = consigo, sei fazer. \"I can create\" = eu sei criar."},
+  {q:"A pessoa que escreveu a frase:", ctx:"I am learning Python and MySQL at school.", o:["está aprendendo Python e MySQL","ensina Python e MySQL","já domina Python e MySQL","não gosta de Python e MySQL"], e:"\"I am learning\" = estou aprendendo.", c:["I am learning","estou aprendendo"]},
+  {t:"order", q:"Monte a frase: \"Eu gosto de resolver problemas.\"", w:["I","like","to","solve","problems"], e:"Solve = resolver.", c:["solve","resolver"]},
+  {t:"type", q:"Digite em inglês: \"objetivo\" (meta)", ans:["goal"], e:"Goal = objetivo, meta.", c:["goal","objetivo"]},
+  {q:"Qual é o nível de inglês de Ana?", ctx:"Ana Lima\nStudent of Systems Development\nSkills: HTML, CSS, JavaScript, Git\nLanguages: Portuguese (native), English (basic)", o:["Básico","Avançado","Nativo","Não informado"], e:"Languages = idiomas. English (basic) = inglês básico.", c:["languages","idiomas"]},
+  {t:"spot", q:"A apresentação tem um verbo errado. Clique nele.", w:["I","am","a","hard-working","student","and","I","can","works","in","a","team."], a:8, e:"Depois de can, o verbo fica na forma simples: \"I can work in a team\".", c:["hard-working","esforçado(a)"]}
+ ]},
+ {id:"6.4", ic:"question", name:"The interview", intro:{en:"You got an interview! Let's practice the most common questions.", pt:"Perguntas comuns em entrevistas."}, items:[
+  {t:"match", q:"Ligue cada pergunta de entrevista à tradução.", pairs:[["Tell me about yourself","Fale sobre você"],["Why do you want this job?","Por que você quer esta vaga?"],["What are your strengths?","Quais são os seus pontos fortes?"],["Do you have any questions?","Você tem alguma pergunta?"],["When can you start?","Quando você pode começar?"]]},
+  {q:"O entrevistador diz: \"Tell me about yourself.\" Qual é a melhor resposta?", o:["I am a student of Systems Development and I like programming.","I am fine, thanks.","My yourself is good.","Yes, I do."], e:"O entrevistador pede que você se apresente.", c:["Tell me about yourself","Fale sobre você"]},
+  {q:"O entrevistador pergunta: \"What are your strengths?\" Qual é a melhor resposta?", o:["I learn fast and I work well in a team.","I am strong at the gym.","I don't know my team.","My strength is 16 years old."], e:"Strengths = pontos fortes profissionais.", c:["strengths","pontos fortes"]},
+  {q:"A pessoa conta que:", ctx:"I have worked on a school project with a team of four people.", o:["já trabalhou em um projeto escolar em equipe","nunca trabalhou em equipe","trabalha sozinha em quatro projetos","vai trabalhar em um projeto escolar"], e:"\"I have worked on\" = já trabalhei em. É assim que falamos de experiências.", c:["I have worked on","já trabalhei em"]},
+  {q:"Complete a frase.", ctx:"I want this job ___ I want to learn and grow.", o:["because","but","if","or"], e:"Because = porque. Grow = crescer.", c:["because","porque"]},
+  {t:"order", q:"Monte a resposta: \"Eu posso começar na semana que vem.\"", w:["I","can","start","next","week"], e:"Next week = semana que vem."},
+  {t:"type", q:"Digite em inglês: \"entrevista\"", ans:["interview"], e:"Interview = entrevista.", c:["interview","entrevista"]},
+  {q:"No fim, o entrevistador pergunta: \"Do you have any questions?\" Qual é uma boa pergunta para fazer?", o:["What technologies does the team use?","Can I go home now?","Is this the interview?","Why are you asking me questions?"], e:"Perguntar sobre as tecnologias da equipe mostra interesse pela vaga."}
+ ]},
+ {id:"6.B", ic:"rocket", name:"Desafio: Dream job", boss:true, intro:{en:"An e-mail from HR just arrived. This is your big chance!", pt:"Desafio final do jogo: a vaga dos sonhos."}, items:[
+  {q:"Qual é o motivo do e-mail?", ctx:DREAM, o:["Convidar para uma entrevista","Cancelar a vaga","Oferecer um aumento","Recusar a candidatura"], e:"\"Interview invitation\" = convite para entrevista.", c:["invitation","convite"]},
+  {q:"Como e quando será a entrevista?", ctx:DREAM, o:["On-line, na terça-feira às 14h","On-line, na quinta-feira às 14h","Por telefone, às 2h da manhã","Presencial, na terça-feira às 14h"], e:"\"An online interview on Tuesday at 2 p.m.\" Tuesday = terça-feira."},
+  {q:"O que o candidato deve fazer agora?", ctx:DREAM, o:["Confirmar por e-mail","Enviar o currículo de novo","Ir até a NovaByte","Ligar para a empresa"], e:"\"Please confirm by e-mail\" = por favor, confirme por e-mail.", c:["confirm","confirmar"]},
+  {q:"Para qual vaga é a entrevista?", ctx:DREAM, o:["Estágio de desenvolvedor júnior","Analista de suporte sênior","Gerente de RH","Líder técnico"], e:"\"Junior Developer internship\" = estágio de desenvolvedor júnior."},
+  {t:"order", q:"Monte a resposta: \"Obrigado pelo convite.\"", w:["Thank","you","for","the","invitation"], e:"\"Thank you for\" = obrigado por."},
+  {t:"order", q:"Monte a frase: \"Eu confirmo a entrevista na terça-feira.\"", w:["I","confirm","the","interview","on","Tuesday"], e:"Com dias da semana usamos on: \"on Tuesday\"."},
+  {t:"type", q:"Digite em inglês: \"habilidades\"", ans:["skills"], e:"Skills = habilidades.", c:["skills","habilidades"]},
+  {t:"match", q:"Ligue cada palavra à tradução.", pairs:[["resume (CV)","currículo"],["job","emprego / vaga"],["interview","entrevista"],["candidate","candidato(a)"],["company","empresa"]]},
+  {t:"spot", q:"A frase do candidato tem um verbo errado. Clique nele.", w:["I","am","learning","Python","and","I","has","experience","with","Git."], a:6, e:"Com I, usamos have: \"I have experience with Git\"."},
+  {q:"Qual é a notícia?", ctx:"Maya: Congratulations! You got the job. Welcome to the international team!", o:["Você conseguiu a vaga","A vaga foi cancelada","Você foi transferido de equipe","Você precisa refazer a entrevista"], e:"\"You got the job\" = você conseguiu a vaga. Congratulations = parabéns!", c:["Congratulations!","Parabéns!"]}
+ ]}
+]}
+);
+const COMING = [];
 const PHASE_IDS = [], PHASE_BY_ID = {};
 WORLDS.forEach(w => w.phases.forEach(p => { PHASE_IDS.push(p.id); PHASE_BY_ID[p.id] = p; }));
 
@@ -408,7 +641,23 @@ const ICONS = {
   key:'<circle cx="15" cy="24" r="8" fill="#FFD23F"/><path d="M23 24h20M36 24v7M42 24v5"/>',
   chart:'<rect x="7" y="26" width="8" height="15" rx="2" fill="#FF5C8A"/><rect x="20" y="16" width="8" height="25" rx="2" fill="#3EC5FF"/><rect x="33" y="7" width="8" height="34" rx="2" fill="#2EE6A6"/>',
   flame:'<path d="M24 4c5 9 13 13 13 25a13 13 0 0 1-26 0c0-7 5-9 7-16 3 3 5 2 6-9z" fill="#FF8A3D"/>',
-  bolt:'<path d="M27 4 9 27h12l-3 17 19-24H25z" fill="#FFD23F"/>'
+  bolt:'<path d="M27 4 9 27h12l-3 17 19-24H25z" fill="#FFD23F"/>',
+  code:'<path d="M17 14 6 24l11 10M31 14l11 10-11 10" stroke-width="4"/><path d="M27 9l-6 30" stroke="#5B2EFF" stroke-width="4"/>',
+  book:'<path d="M6 9h14a4 4 0 0 1 4 4v27a4 4 0 0 0-4-4H6zM42 9H28a4 4 0 0 0-4 4v27a4 4 0 0 1 4-4h14z" fill="#fff"/>',
+  branch:'<path d="M14 14v20M14 27c12 0 20-3 20-13"/><circle cx="14" cy="10" r="4.5" fill="#fff"/><circle cx="14" cy="38" r="4.5" fill="#fff"/><circle cx="34" cy="10" r="4.5" fill="#fff"/>',
+  pencil:'<path d="M8 40l3-11L32 8l8 8-21 21z" fill="#fff"/><path d="M27 13l8 8"/>',
+  eye:'<path d="M4 24s8-13 20-13 20 13 20 13-8 13-20 13S4 24 4 24z" fill="#fff"/><circle cx="24" cy="24" r="5.5" fill="#1B1464"/>',
+  question:'<circle cx="24" cy="24" r="19" fill="#fff"/><path d="M18 19a6 6 0 1 1 9 5c-2 1-3 2-3 5M24 35h.1" stroke-width="4"/>',
+  list:'<rect x="8" y="6" width="32" height="36" rx="4" fill="#fff"/><path d="M15 16h.1M15 24h.1M15 32h.1" stroke-width="4.5"/><path d="M22 16h11M22 24h11M22 32h11"/>',
+  headset:'<path d="M8 28v-4a16 16 0 0 1 32 0v4"/><rect x="5" y="26" width="9" height="13" rx="3" fill="#fff"/><rect x="34" y="26" width="9" height="13" rx="3" fill="#fff"/><path d="M38 39c0 4-4 5-10 5"/>',
+  mail:'<rect x="5" y="10" width="38" height="28" rx="4" fill="#fff"/><path d="M6 13l18 14 18-14"/>',
+  ticket:'<path d="M5 14h38v7a4 4 0 0 0 0 8v7H5v-7a4 4 0 0 0 0-8z" fill="#fff"/><path d="M30 16v3M30 23v3M30 30v3"/>',
+  people:'<path d="M31 28c6 0 11 4 11 12h-9" fill="#fff"/><circle cx="33" cy="18" r="5" fill="#fff"/><path d="M5 40c0-8 5-13 12-13s12 5 12 13z" fill="#fff"/><circle cx="17" cy="16" r="6.5" fill="#fff"/>',
+  calendar:'<rect x="6" y="10" width="36" height="32" rx="4" fill="#fff"/><path d="M6 19h36M15 6v8M33 6v8"/><path d="M15 27h.1M24 27h.1M33 27h.1M15 34h.1M24 34h.1" stroke-width="4"/>',
+  rocket:'<path d="M16 24l-7 8h8M32 24l7 8h-8M20 34l4 9 4-9"/><path d="M24 4c8 6 10 16 8 28H16C14 20 16 10 24 4z" fill="#fff"/><circle cx="24" cy="17" r="4" fill="#3EC5FF"/>',
+  doc:'<path d="M11 5h17l10 10v28H11z" fill="#fff"/><path d="M28 5v10h10M17 24h14M17 31h14M17 37h8"/>',
+  briefcase:'<rect x="5" y="15" width="38" height="25" rx="4" fill="#fff"/><path d="M17 15v-4a3 3 0 0 1 3-3h8a3 3 0 0 1 3 3v4M5 26h38M24 24v5"/>',
+  user:'<path d="M7 43c0-10 7-16 17-16s17 6 17 16z" fill="#fff"/><circle cx="24" cy="16" r="9" fill="#fff"/>'
 };
 function svgEl(vb, inner, cls, label){
   const s = document.createElement("span");
@@ -438,21 +687,30 @@ function maya(){
     '<path d="M25 31h.1M35 31h.1" stroke-width="3.5"/><path d="M25.5 36.5q4.500 3.500 9 0" fill="none"/>' +
     '<path d="M15 31a15 15 0 0 1 30 0" fill="none" stroke="#FF5C8A" stroke-width="3.5"/><rect x="11.500" y="28" width="6" height="10" rx="2.500" fill="#FF5C8A"/><rect x="42.500" y="28" width="6" height="10" rx="2.500" fill="#FF5C8A"/></g>', null, "Maya");
 }
-function banner(n){
-  const open = '<g stroke="#1B1464" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" fill="none">';
-  if (n === 1) return svgEl("0 0 300 120", open +
-    '<path d="M40 70h28l-4 26H44z" fill="#FF8A3D"/><path d="M54 70c-2-18-16-22-22-20 2 10 10 18 22 20zM54 70c2-22 18-26 24-24-2 12-10 20-24 24z" fill="#2EE6A6"/><path d="M54 70V54"/>' +
+const BANNERS = {
+  1:'<path d="M40 70h28l-4 26H44z" fill="#FF8A3D"/><path d="M54 70c-2-18-16-22-22-20 2 10 10 18 22 20zM54 70c2-22 18-26 24-24-2 12-10 20-24 24z" fill="#2EE6A6"/><path d="M54 70V54"/>' +
     '<rect x="96" y="12" width="108" height="70" rx="8" fill="#fff"/><rect x="106" y="22" width="88" height="50" rx="3" fill="#1B1464"/>' +
     '<path d="M116 33h24" stroke="#FF5C8A"/><path d="M116 43h46M124 53h30" stroke="#2EE6A6"/><path d="M116 63h18" stroke="#FFD23F"/>' +
     '<path d="M142 82h16v14h-16z" fill="#fff"/><path d="M228 66h26v24a6 6 0 0 1-6 6h-14a6 6 0 0 1-6-6z" fill="#FFD23F"/><path d="M254 72h6a6 6 0 0 1 0 12h-6M236 58c-3-5 3-7 0-12M246 58c-3-5 3-7 0-12"/>' +
-    '<path d="M4 97h292" stroke-width="5"/></g>');
-  return svgEl("0 0 300 120", open +
-    '<path d="M36 40l26 46H10z" fill="#FFD23F"/><path d="M36 58v12M36 78h.1" stroke-width="4"/>' +
+    '<path d="M4 97h292" stroke-width="5"/>',
+  2:'<path d="M36 40l26 46H10z" fill="#FFD23F"/><path d="M36 58v12M36 78h.1" stroke-width="4"/>' +
     '<rect x="78" y="10" width="150" height="98" rx="10" fill="#14103A"/><path d="M78 30h150"/>' +
     '<path d="M90 20h.1" stroke="#FF5C8A" stroke-width="6"/><path d="M101 20h.1" stroke="#FFD23F" stroke-width="6"/><path d="M112 20h.1" stroke="#2EE6A6" stroke-width="6"/>' +
     '<path d="M92 46h62" stroke="#FF5C8A"/><path d="M92 60h104M92 74h42" stroke="#fff"/><path d="M92 90h76" stroke="#2EE6A6"/>' +
-    '<g transform="translate(262 62) rotate(18)"><path d="M-10-4h-9M-10 5h-10M-9 13l-8 5M10-4h9M10 5h10M9 13l8 5M-3-22l-4-5M3-22l4-5"/><ellipse cx="0" cy="4" rx="11" ry="15" fill="#fff"/><circle cx="0" cy="-15" r="6" fill="#1B1464"/><path d="M0-9V19"/></g></g>');
-}
+    '<g transform="translate(262 62) rotate(18)"><path d="M-10-4h-9M-10 5h-10M-9 13l-8 5M10-4h9M10 5h10M9 13l8 5M-3-22l-4-5M3-22l4-5"/><ellipse cx="0" cy="4" rx="11" ry="15" fill="#fff"/><circle cx="0" cy="-15" r="6" fill="#1B1464"/><path d="M0-9V19"/></g>',
+  3:'<rect x="36" y="12" width="140" height="96" rx="10" fill="#fff"/><path d="M36 32h140"/><path d="M48 22h.1" stroke="#FF5C8A" stroke-width="6"/><path d="M59 22h.1" stroke="#FFD23F" stroke-width="6"/>' +
+    '<path d="M88 54 70 70l18 16M124 54l18 16-18 16" stroke-width="5"/><path d="M113 48l-14 44" stroke="#5B2EFF" stroke-width="5"/>' +
+    '<path d="M200 36h28a8 8 0 0 1 8 8v58a8 8 0 0 0-8-8h-28zM272 36h-28a8 8 0 0 0-8 8v58a8 8 0 0 1 8-8h28z" fill="#FFD23F"/><path d="M208 52h16M208 64h16M248 52h16M248 64h16"/>',
+  4:'<path d="M24 24h150v22a12 12 0 0 0 0 24v22H24V70a12 12 0 0 0 0-24z" fill="#fff"/><path d="M134 30v8M134 46v8M134 62v8M134 78v8"/>' +
+    '<path d="M46 46h66M46 60h44M46 74h56" stroke="#5B2EFF"/><path d="M150 54l6 6 10-12" stroke="#2EE6A6" stroke-width="5"/>' +
+    '<path d="M214 70V58a28 28 0 0 1 56 0v12"/><rect x="206" y="66" width="16" height="26" rx="6" fill="#FF5C8A"/><rect x="262" y="66" width="16" height="26" rx="6" fill="#FF5C8A"/><path d="M270 92c0 10-10 12-24 12"/>',
+  5:'<path d="M28 16h104a10 10 0 0 1 10 10v30a10 10 0 0 1-10 10H70L52 82V66H28a10 10 0 0 1-10-10V26a10 10 0 0 1 10-10z" fill="#fff"/><path d="M34 34h82M34 48h50" stroke="#5B2EFF"/>' +
+    '<path d="M168 44h96a10 10 0 0 1 10 10v28a10 10 0 0 1-10 10h-14v14l-16-14h-56a10 10 0 0 1-10-10V54a10 10 0 0 1 10-10z" fill="#2EE6A6"/><path d="M180 62h72M180 76h44"/>' +
+    '<path d="M150 22l6 12 13 2-10 9 3 13-12-7-12 7 3-13-10-9 13-2z" fill="#FFD23F" transform="translate(52 -14) scale(.55)"/>',
+  6:'<path d="M52 10h62l28 28v72H52z" fill="#fff"/><path d="M114 10v28h28"/><circle cx="78" cy="44" r="10" fill="#FFD23F"/><path d="M66 70h62M66 82h62M66 94h38" stroke="#5B2EFF"/>' +
+    '<circle cx="222" cy="60" r="40" fill="#3EC5FF"/><path d="M182 60h80M222 20c-18 12-18 68 0 80M222 20c18 12 18 68 0 80M190 38h64M190 82h64"/>'
+};
+function banner(n){ return svgEl("0 0 300 120", '<g stroke="#1B1464" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" fill="none">' + BANNERS[n] + '</g>'); }
 function stars(n, big){
   const s = h("span", {class:"stars" + (big ? " big" : ""), role:"img", "aria-label":n + " de 3 estrelas"});
   for (let i = 0; i < 3; i++) s.append(svgEl("0 0 48 48", G(i < n ? ICONS.star : ICONS.star.replace("#FFD23F", "#fff")), i < n ? "fill" : ""));
@@ -472,6 +730,7 @@ function confetti(){
 }
 
 /* ============================ UTILIDADES ============================ */
+const PROF_LINK = !!CONFIG.CHAVE_PROFESSORA && new URLSearchParams(location.search).has(CONFIG.CHAVE_PROFESSORA);
 const FORMA = (new URLSearchParams(location.search).get("forma") === "2" || CONFIG.FORMA_TESTE === 2) ? 2 : 1;
 const LABELS = {
   mc:["Choose the best option.", "Escolha a melhor opção."],
@@ -512,16 +771,17 @@ function fmtTime(s){ return Math.floor(s / 60) + ":" + String(s % 60).padStart(2
 /* ============================== ESTADO ============================== */
 let profiles = LS.get("deq_profiles", {});
 let P = null;
-function save(){ if (!P) return; profiles[P.key] = P; LS.set("deq_profiles", profiles); }
+function save(){ if (!P || P.admin) return; profiles[P.key] = P; LS.set("deq_profiles", profiles); }
 function newProfile(name, turma, key, av){ return {key, name, turma, av, modoB:false, test:null, stars:{}, best:{}, tries:{}, xp:0, deck:{}, days:[], secs:0, okSum:0, totSum:0, flags:{}}; }
 function fixProfile(p){ ["stars", "best", "tries", "deck", "flags"].forEach(k => { if (!p[k]) p[k] = {}; }); if (!p.days) p.days = []; ["xp", "secs", "okSum", "totSum", "av"].forEach(k => { if (!p[k]) p[k] = 0; }); return p; }
 function setModoB(v){ if (P){ P.modoB = v; save(); } document.body.classList.toggle("modoB", !!v); }
 function passed(id){ return (P.stars[id] || 0) >= 1; }
 function passedCount(){ return PHASE_IDS.filter(passed).length; }
 function starTotal(){ return PHASE_IDS.reduce((s, id) => s + (P.stars[id] || 0), 0); }
-function role(){ return passed("2.B") ? "Junior Developer" : passed("1.B") ? "Trainee" : "Intern"; }
+const ROLES = ["Intern", "Trainee", "Junior Developer", "Mid-level Developer", "Senior Developer", "Tech Lead", "Global Tech Lead"];
+function role(){ return ROLES[WORLDS.filter(w => passed(w.phases[w.phases.length - 1].id)).length]; }
 /* Todos começam do zero: cada fase abre quando a anterior é concluída. */
-function phaseOpen(idx){ return !!P.test && (idx === 0 || passed(PHASE_IDS[idx - 1])); }
+function phaseOpen(idx){ return !!P.admin || (!!P.test && (idx === 0 || passed(PHASE_IDS[idx - 1]))); }
 function addCard(c){
   if (!c) return 0;
   const k = c[0].toLowerCase();
@@ -532,6 +792,10 @@ const BADGES = [
   {ic:"chat", nome:"Primeiro dia", como:"Conclua a fase Welcome aboard", ok:() => passed("1.1")},
   {ic:"trophy", nome:"Onboarding completo", como:"Vença o desafio do Mundo 1", ok:() => passed("1.B")},
   {ic:"bug", nome:"Caça-bugs", como:"Vença o desafio do Mundo 2", ok:() => passed("2.B")},
+  {ic:"eye", nome:"Código revisado", como:"Vença o desafio do Mundo 3", ok:() => passed("3.B")},
+  {ic:"ticket", nome:"Fila zerada", como:"Vença o desafio do Mundo 4", ok:() => passed("4.B")},
+  {ic:"calendar", nome:"Sprint entregue", como:"Vença o desafio do Mundo 5", ok:() => passed("5.B")},
+  {ic:"rocket", nome:"Pronto para o mundo", como:"Vença o desafio do Mundo 6", ok:() => passed("6.B")},
   {ic:"star", nome:"Três estrelas", como:"Ganhe 3 estrelas em uma fase", ok:() => PHASE_IDS.some(id => P.stars[id] === 3)},
   {ic:"bolt", nome:"Combo x5", como:"Acerte 5 seguidas em uma fase", ok:() => !!P.flags.combo5},
   {ic:"cards", nome:"Baralho zerado", como:"Esvazie o baralho de revisão", ok:() => !!P.flags.deckClear},
@@ -540,33 +804,37 @@ const BADGES = [
 
 /* ======================== CÓDIGO DE PROGRESSO ======================== */
 const ALPHA = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-function codeFields(){
+const CODE_V2_IDS = PHASE_IDS.slice(0, 10);
+function codeFields(ids){
   const f = [["v",4],["turma",1],["modoB",1],["done",1],["band",2],["forma",1],["av",3],["xp",12]];
-  PHASE_IDS.forEach(id => f.push(["s" + id, 2]));
+  ids.forEach(id => f.push(["s" + id, 2]));
   return f;
 }
+function codeLen(ids){ return Math.ceil(codeFields(ids).reduce((t, x) => t + x[1], 0) / 5); }
 function packCode(){
-  const vals = {v:2, turma:Number(P.turma) - 1, modoB:P.modoB ? 1 : 0, done:P.test ? 1 : 0, band:P.test ? P.test.band : 0,
+  const vals = {v:3, turma:Number(P.turma) - 1, modoB:P.modoB ? 1 : 0, done:P.test ? 1 : 0, band:P.test ? P.test.band : 0,
     forma:P.test ? P.test.forma - 1 : 0, av:P.av || 0, xp:Math.min(4095, Math.round(P.xp / 10))};
   PHASE_IDS.forEach(id => { vals["s" + id] = P.stars[id] || 0; });
   let n = 0n;
-  for (const [k, b] of codeFields()) n = (n << BigInt(b)) | BigInt(vals[k]);
-  let s = "";
-  for (let i = 0; i < 9; i++){ s = ALPHA[Number(n & 31n)] + s; n >>= 5n; }
+  for (const [k, b] of codeFields(PHASE_IDS)) n = (n << BigInt(b)) | BigInt(vals[k]);
+  const len = codeLen(PHASE_IDS); let s = "";
+  for (let i = 0; i < len; i++){ s = ALPHA[Number(n & 31n)] + s; n >>= 5n; }
   let ck = 0;
-  for (let i = 0; i < 9; i++) ck = (ck + (i + 1) * ALPHA.indexOf(s[i])) % 32;
-  s += ALPHA[ck];
-  return s.slice(0, 5) + "-" + s.slice(5);
+  for (let i = 0; i < len; i++) ck = (ck + (i + 1) * ALPHA.indexOf(s[i])) % 32;
+  return (s + ALPHA[ck]).match(/.{1,5}/g).join("-");
 }
 function decodeCode(txt){
   const s = String(txt).toUpperCase().replace(/[^A-Z0-9]/g, "");
-  if (s.length !== 10) return null;
-  let ck = 0, n = 0n;
-  for (let i = 0; i < 9; i++){ const d = ALPHA.indexOf(s[i]); if (d < 0) return null; ck = (ck + (i + 1) * d) % 32; n = (n << 5n) | BigInt(d); }
-  if (ALPHA[ck] !== s[9]) return null;
-  const out = {}; const f = codeFields();
+  let ids, ver;
+  if (s.length === codeLen(PHASE_IDS) + 1){ ids = PHASE_IDS; ver = 3; }
+  else if (s.length === codeLen(CODE_V2_IDS) + 1){ ids = CODE_V2_IDS; ver = 2; }
+  else return null;
+  const len = s.length - 1; let ck = 0, n = 0n;
+  for (let i = 0; i < len; i++){ const d = ALPHA.indexOf(s[i]); if (d < 0) return null; ck = (ck + (i + 1) * d) % 32; n = (n << 5n) | BigInt(d); }
+  if (ALPHA[ck] !== s[len]) return null;
+  const out = {}; const f = codeFields(ids);
   for (let i = f.length - 1; i >= 0; i--){ const b = BigInt(f[i][1]); out[f[i][0]] = Number(n & ((1n << b) - 1n)); n >>= b; }
-  if (out.v !== 2 || out.av > 5) return null;
+  if (out.v !== ver || out.av > 5) return null;
   out.turma += 1; out.forma += 1;
   return out;
 }
@@ -597,6 +865,7 @@ async function post(payload){
   } finally { clearTimeout(timer); }
 }
 async function deliver(payload){
+  if (P && P.admin) return "admin";
   const st = await post(payload);
   if (st === "fail"){ const q = LS.get("deq_queue", []); if (!q.some(x => x.id === payload.id)){ q.push(payload); LS.set("deq_queue", q); } }
   return st;
@@ -626,7 +895,7 @@ function hud(){
   const lvl = Math.floor(P.xp / 100) + 1, d = P.days.length;
   return h("header", {class:"hud"}, bit(AV_COLORS[P.av || 0], "happy", "me"),
     h("div", {class:"id"}, h("b", null, P.name),
-      h("div", {class:"chips"}, h("span", {class:"chip sky"}, turmaLabel(P.turma)), h("span", {class:"chip pink"}, role()),
+      h("div", {class:"chips"}, h("span", {class:"chip " + (P.admin ? "mint" : "sky")}, P.admin ? "Modo professora" : turmaLabel(P.turma)), h("span", {class:"chip pink"}, role()),
         h("span", {class:"chip sun"}, icon("star"), starTotal() + " de " + PHASE_IDS.length * 3),
         h("span", {class:"chip"}, icon("flame"), d + (d === 1 ? " dia de treino" : " dias de treino")))),
     h("div", {class:"xp"}, h("div", null, h("b", null, "Nível " + lvl), h("span", {class:"muted"}, "  " + P.xp + " XP")),
@@ -639,7 +908,7 @@ function screenLogin(){
   const nome = h("input", {type:"text", id:"nome", autocomplete:"off", maxlength:"80"});
   const turma = h("select", {id:"turma"}, h("option", {value:""}, "Selecione"), h("option", {value:"1"}, "1º ano"), h("option", {value:"2"}, "2º ano"));
   const modo = h("input", {type:"checkbox", id:"modo"});
-  const code = h("input", {type:"text", id:"code", maxlength:"14", placeholder:"XXXXX-XXXXX", autocomplete:"off"});
+  const code = h("input", {type:"text", id:"code", maxlength:"24", placeholder:"XXXXX-XXXXX-XXXXX-XXX", autocomplete:"off"});
   const err = h("p", {class:"errmsg", role:"alert"});
   const avBtns = AV_COLORS.map((c, i) => h("button", {class:"av", type:"button", "aria-pressed":i === av ? "true" : "false", "aria-label":"Robô " + (i + 1),
     onclick:() => { av = i; avBtns.forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false")); }}, bit(c, "happy")));
@@ -664,6 +933,9 @@ function screenLogin(){
   show(
     h("div", {class:"hero"}, bit("#FFD23F", "happy"), h("div", null, h("h1", null, "Dev English Quest"),
       h("p", null, "Você acaba de ser contratado pela NovaByte. Suba de cargo treinando o inglês que todo dev usa no trabalho."))),
+    PROF_LINK ? card("mintc", h("h3", null, "Modo professora"),
+      h("p", null, "Abre todas as fases sem precisar jogar, mostra as respostas e permite pular atividades. Nada é gravado neste computador nem enviado para a planilha."),
+      h("div", {class:"actions"}, h("button", {class:"btn", type:"button", onclick:() => { P = newProfile("Professora", "1", "__prof__", 3); P.admin = true; setModoB(false); screenHome(); }}, "Entrar no modo professora"))) : null,
     saved.length ? card("lilac", h("h3", null, "Continuar neste computador"),
       h("div", {class:"saved"}, saved.map(p => h("button", {class:"btn", type:"button", onclick:() => enter(p)}, bit(AV_COLORS[p.av || 0], "happy"), p.name + " (" + turmaLabel(p.turma) + ")")))) : null,
     card("", h("h2", null, "Novo jogador"),
@@ -691,7 +963,7 @@ function screenHome(){
     h("button", {class:"btn" + (P.modoB ? " on" : ""), type:"button", "aria-pressed":P.modoB ? "true" : "false", onclick:() => { setModoB(!P.modoB); screenHome(); }}, "Modo B: " + (P.modoB ? "ligado" : "desligado")),
     h("button", {class:"btn", type:"button", onclick:screenLogin}, "Sair")));
   if (!P.test){
-    nodes.push(card("sun", h("h2", null, "Antes de começar: teste de nível"),
+    nodes.push(card("sun", h("h2", null, P.admin ? "Teste de nível (opcional no modo professora)" : "Antes de começar: teste de nível"),
       h("p", null, "São 24 questões rápidas. O teste não vale nota e não muda o seu ponto de partida: todo mundo começa junto, na fase 1."),
       h("div", {class:"actions"}, h("button", {class:"btn", type:"button", onclick:screenTestIntro}, "Fazer o teste de nível"))));
   } else if (P.test.forma !== FORMA){
@@ -713,7 +985,7 @@ function screenHome(){
         open ? null : h("p", null, h("b", null, P.test ? "Vença o desafio do mundo anterior para liberar." : "Faça o teste de nível para liberar.")))),
       trail));
   });
-  nodes.push(card("lilac", h("h3", null, "Em breve"), h("div", {class:"soon"}, COMING.map(c => h("span", {class:"chip"}, icon("lock"), c)))));
+  if (COMING.length) nodes.push(card("lilac", h("h3", null, "Em breve"), h("div", {class:"soon"}, COMING.map(c => h("span", {class:"chip"}, icon("lock"), c)))));
   show(nodes);
 }
 
@@ -740,6 +1012,12 @@ function renderItem(box, it, mode, done){
   if (hint && isB()){
     const hp = h("p", {class:"hint", hidden:true}, "Dica: " + hint);
     box.append(h("div", {class:"tools"}, h("button", {class:"btn", type:"button", onclick:() => { hp.hidden = false; }}, icon("bulb"), "Dica")), hp);
+  }
+  if (P.admin){
+    const ans = type === "mc" ? it.o[0] : type === "type" ? it.ans[0] : type === "order" ? it.w.join(" ") : type === "spot" ? it.w[it.a] : it.pairs.map(p => p[0] + " = " + p[1]).join("  |  ");
+    const ap = h("p", {class:"hint", hidden:true}, "Resposta: " + ans);
+    box.append(h("div", {class:"tools"}, h("button", {class:"btn", type:"button", onclick:() => { ap.hidden = false; }}, "Mostrar resposta"),
+      h("button", {class:"btn", type:"button", onclick:() => { if (locked) return; locked = true; onKey = null; done(true, []); }}, "Pular atividade")), ap);
   }
   const area = h("div"); box.append(area);
   const conf = h("button", {class:"btn primary", type:"button", disabled:true}, game ? "Confirmar" : "Próxima");
@@ -877,7 +1155,8 @@ function screenReport(rep, sending){
   const st = h("p", {class:"status", role:"status"}, sending ? "Enviando o relatório para a professora..." : "");
   function setStatus(s){
     st.className = "status " + (s === "ok" || s === "sent" ? "ok" : "warn");
-    st.textContent = s === "ok" ? "Relatório enviado para a professora."
+    st.textContent = s === "admin" ? "Modo professora: este relatório não foi enviado para a planilha."
+      : s === "ok" ? "Relatório enviado para a professora."
       : s === "sent" ? "Relatório enviado para a professora (sem confirmação do servidor). Na dúvida, use Copiar ou Baixar e poste no Classroom."
       : s === "noconfig" ? "O envio automático não está configurado neste arquivo. Use Copiar ou Baixar e poste o relatório no Classroom."
       : "Sem conexão agora. O relatório ficou guardado neste computador e será reenviado sozinho. Use também Copiar ou Baixar e poste no Classroom.";
@@ -920,7 +1199,9 @@ function playPhase(idx){
     h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:start}, "Começar a fase"), h("button", {class:"btn", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
   function start(){
     const count = h("span", null), bar = h("i"), clock = h("span", {class:"clock"}, "0:00"), combo = h("span", {class:"chip combo", hidden:true}), box = h("div");
-    show(h("div", {class:"phasehead"}, count, h("div", {class:"xpbar"}, bar), combo, clock, h("button", {class:"btn", type:"button", onclick:screenHome}, "Sair da fase")), card("", box));
+    show(h("div", {class:"phasehead"}, count, h("div", {class:"xpbar"}, bar), combo, clock,
+      P.admin ? h("button", {class:"btn", type:"button", onclick:() => { ok += items.length - i; i = items.length; end(); }}, "Pular fase") : null,
+      h("button", {class:"btn", type:"button", onclick:screenHome}, "Sair da fase")), card("", box));
     t0 = Date.now();
     clockTimer = setInterval(() => { clock.textContent = fmtTime(Math.floor((Date.now() - t0) / 1000)); }, 1000);
     (function next(){
