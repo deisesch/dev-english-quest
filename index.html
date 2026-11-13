@@ -1,0 +1,1033 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dev English Quest</title>
+<style>
+:root{--ink:#1B1464;--grape:#5B2EFF;--sun:#FFD23F;--pink:#FF5C8A;--mint:#2EE6A6;--sky:#3EC5FF;--orange:#FF8A3D;--lilac:#E9E3FF;--ok:#0B7A54;--okbg:#D6FBEC;--err:#C2185B;--errbg:#FFE1EB;--muted:#544E8C;--off:#D9D5EC}
+*{box-sizing:border-box}
+html{font-size:17px}
+body{margin:0;font-family:"Trebuchet MS",Trebuchet,Tahoma,sans-serif;color:var(--ink);line-height:1.5;background-color:var(--grape);background-image:radial-gradient(rgba(255,255,255,.16) 2px,transparent 2.6px);background-size:28px 28px}
+body.modoB{font-size:1.22rem;line-height:1.85;letter-spacing:.02em;background-image:none}
+body.modoB *{animation:none !important;transition:none !important}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}}
+.wrap{max-width:920px;margin:0 auto;padding:18px 20px 60px}
+h1,h2,h3,p{margin:0}
+h2{font-size:1.5em;line-height:1.2;margin-bottom:.4em}
+h3{font-size:1.15em;line-height:1.25}
+p + p{margin-top:.55em}
+.svg{display:inline-block;line-height:0}
+.svg svg{width:100%;height:100%;display:block}
+
+/* cartões e botões no estilo adesivo: contorno grosso e sombra dura */
+.card{background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);padding:20px 22px;margin:18px 0}
+.card.sun{background:var(--sun)}.card.sky{background:var(--sky)}.card.pinkc{background:var(--pink)}.card.mintc{background:var(--mint)}.card.lilac{background:var(--lilac)}
+.btn{font:inherit;font-weight:bold;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:14px;padding:.5em 1em;box-shadow:4px 4px 0 var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:.5em;transition:transform .06s,box-shadow .06s}
+.btn .svg{width:1.4em;height:1.4em}
+.btn:hover:not(:disabled){background:var(--lilac)}
+.btn:active:not(:disabled){transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.btn.primary{background:var(--sun)}.btn.primary:hover:not(:disabled){background:#FFE27A}
+.btn.on{background:var(--mint)}
+.btn:disabled{background:var(--off);box-shadow:none;cursor:not-allowed;color:var(--muted)}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:4px solid var(--orange);outline-offset:3px}
+.actions{display:flex;flex-wrap:wrap;gap:12px;margin-top:16px}
+input[type=text],select{font:inherit;color:var(--ink);padding:.55em .7em;border:3px solid var(--ink);border-radius:12px;width:100%;max-width:460px;background:#fff}
+label{display:block;font-weight:bold;margin:1em 0 .3em}
+label.check{display:flex;gap:.6em;align-items:flex-start;font-weight:normal}
+label.check input{width:1.3em;height:1.3em;margin-top:.2em;flex:none;accent-color:var(--grape)}
+.muted{color:var(--muted);font-size:.92em}
+.errmsg{color:var(--err);font-weight:bold;min-height:1.5em;margin-top:.6em}
+.chip{display:inline-flex;align-items:center;gap:.35em;border:2.5px solid var(--ink);border-radius:999px;padding:.1em .7em;font-weight:bold;font-size:.9em;background:#fff;white-space:nowrap}
+.chip .svg{width:1.15em;height:1.15em}
+.chip.sun{background:var(--sun)}.chip.mint{background:var(--mint)}.chip.pink{background:var(--pink)}.chip.sky{background:var(--sky)}
+
+/* abertura */
+.hero{display:flex;gap:22px;align-items:center;color:#fff;margin:10px 0 4px}
+.hero .svg{width:150px;height:120px;flex:none;animation:bob 3s ease-in-out infinite}
+.hero h1{font-size:3em;line-height:1;letter-spacing:-.02em;text-shadow:4px 4px 0 var(--ink)}
+.hero p{font-size:1.1em;margin-top:.6em;max-width:34em}
+@keyframes bob{50%{transform:translateY(-8px) rotate(-3deg)}}
+.avs{display:flex;flex-wrap:wrap;gap:10px}
+.av{width:68px;height:60px;padding:4px;border:3px solid transparent;border-radius:16px;background:none;cursor:pointer}
+.av[aria-pressed=true]{border-color:var(--ink);background:var(--lilac);box-shadow:3px 3px 0 var(--ink)}
+.saved{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px}
+.saved .btn .svg{width:2.2em;height:1.9em}
+
+/* barra do jogador */
+.hud{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;background:#fff;border:3px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);padding:10px 16px}
+.hud .me{width:66px;height:56px;flex:none}
+.hud .id{flex:1;min-width:200px}
+.hud .id b{font-size:1.15em}
+.hud .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.xp{flex:1;min-width:180px}
+.xpbar{height:16px;border:3px solid var(--ink);border-radius:999px;background:#fff;overflow:hidden}
+.xpbar i{display:block;height:100%;background:var(--mint);transition:width .4s}
+.title{color:#fff;font-size:1.7em;line-height:1.15;margin:22px 0 0;text-shadow:3px 3px 0 var(--ink)}
+
+/* mapa */
+.world{padding:0;overflow:hidden}
+.world .banner{display:flex;gap:16px;align-items:center;padding:14px 20px;border-bottom:3px solid var(--ink)}
+.world .banner .svg{width:210px;height:84px;flex:none}
+.world.w1 .banner{background:var(--sky)}.world.w2 .banner{background:var(--pink)}
+.world.locked .banner{background:var(--off)}
+.trail{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px 8px;padding:22px 18px 20px;position:relative}
+.trail::before{content:"";position:absolute;left:80px;right:80px;top:66px;border-top:5px dotted var(--ink);opacity:.3}
+.node{position:relative;width:148px;padding:0;border:0;background:none;font:inherit;color:var(--ink);text-align:center;cursor:pointer}
+.node:nth-child(even){margin-top:24px}
+.node .disc{width:88px;height:88px;margin:0 auto 8px;border:3px solid var(--ink);border-radius:50%;box-shadow:4px 4px 0 var(--ink);display:grid;place-items:center;background:var(--sun);transition:transform .08s}
+.node .disc .svg{width:50px;height:50px}
+.node:nth-child(2) .disc{background:var(--mint)}.node:nth-child(3) .disc{background:var(--sky)}.node:nth-child(4) .disc{background:var(--orange)}
+.node.boss .disc{border-radius:24px;background:var(--pink);transform:rotate(-4deg)}
+.node:hover:not(:disabled) .disc{transform:translateY(-4px) rotate(3deg)}
+.node:disabled{cursor:not-allowed;color:var(--muted)}
+.node:disabled .disc{background:var(--off);box-shadow:none}
+.node.next .disc{animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{50%{box-shadow:4px 4px 0 var(--ink),0 0 0 10px rgba(255,210,63,.55)}}
+.node b{display:block;line-height:1.2}
+.stars{display:inline-flex;gap:2px;vertical-align:middle}
+.stars .svg{width:1.25em;height:1.25em}
+.stars.big .svg{width:3.4em;height:3.4em}
+.stars.big .svg.fill{animation:pop .5s backwards}
+.stars.big .svg.fill:nth-child(2){animation-delay:.18s}.stars.big .svg.fill:nth-child(3){animation-delay:.36s}
+@keyframes pop{0%{transform:scale(0) rotate(-40deg)}70%{transform:scale(1.25)}}
+.soon{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+
+/* atividades */
+.phasehead{display:flex;gap:12px;align-items:center;margin-bottom:6px;color:#fff;font-weight:bold}
+.phasehead .xpbar{flex:1;height:20px}
+.phasehead .xpbar i{background:var(--sun)}
+body.modoB .clock{display:none}
+.instr{margin-bottom:.5em}
+.instr .en{font-weight:bold;color:var(--grape)}
+.instr .pt{color:var(--muted);margin-left:.6em}
+body.modoB .instr .pt{display:block;margin:0;color:var(--ink);font-weight:bold}
+body.modoB .instr .en{font-weight:normal;font-size:.85em}
+.q{font-size:1.25em;font-weight:bold;line-height:1.3;margin:.7em 0}
+.term{background:#14103A;border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);overflow:hidden;margin:.8em 0}
+.term .dots{display:flex;gap:7px;padding:9px 12px;background:#2B2470}
+.term .dots i{width:12px;height:12px;border-radius:50%;background:var(--pink)}
+.term .dots i:nth-child(2){background:var(--sun)}.term .dots i:nth-child(3){background:var(--mint)}
+.term pre{margin:0;padding:12px 16px 14px;color:#EAFFF7;font-family:Consolas,"Courier New",monospace;font-size:1em;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+.chat{display:flex;gap:12px;align-items:flex-start;margin:.8em 0}
+.chat .svg{width:58px;height:58px;flex:none}
+.bubble{position:relative;background:var(--lilac);border:3px solid var(--ink);border-radius:4px 18px 18px 18px;padding:10px 14px;white-space:pre-wrap;font-size:1.05em}
+.bubble b{display:block;font-size:.85em;color:var(--grape)}
+.note{background:#FFF3B0;border:3px solid var(--ink);border-radius:6px;box-shadow:4px 4px 0 var(--ink);padding:12px 16px;margin:.8em 0;white-space:pre-wrap;transform:rotate(-.5deg)}
+body.modoB .note{transform:none}
+.tools{display:flex;flex-wrap:wrap;gap:8px;margin:.5em 0}
+.tools:empty{display:none}
+.hint{background:#FFF3B0;border:3px dashed var(--ink);padding:8px 12px;border-radius:12px;margin:.6em 0}
+.opts{display:grid;gap:12px;margin:1em 0 .4em}
+.opts.two{grid-template-columns:1fr 1fr}
+.opt{font:inherit;color:var(--ink);text-align:left;background:#fff;border:3px solid var(--ink);border-radius:14px;box-shadow:4px 4px 0 var(--ink);padding:.6em .8em;cursor:pointer;display:flex;gap:.8em;align-items:center;transition:transform .06s,box-shadow .06s}
+.opt .key{flex:none;width:2em;height:2em;border:3px solid var(--ink);border-radius:10px;display:grid;place-items:center;font-weight:bold;background:var(--pink)}
+.opt:nth-child(2) .key{background:var(--sky)}.opt:nth-child(3) .key{background:var(--sun)}.opt:nth-child(4) .key{background:var(--mint)}
+.opt:hover:not(:disabled){background:var(--lilac)}
+.opt.sel{background:var(--lilac);transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
+.opt:disabled{cursor:default}
+.opt.right,.tok.right{background:var(--okbg);border-color:var(--ok)}
+.opt.wrong,.tok.wrong{background:var(--errbg);border-color:var(--err)}
+.tokens{display:flex;flex-wrap:wrap;gap:10px;margin:.7em 0;min-height:3.6em;align-items:center}
+.tokens.line{border:3px dashed var(--ink);border-radius:14px;padding:10px;background:var(--lilac)}
+.tok{font:inherit;font-weight:bold;color:var(--ink);background:#fff;border:3px solid var(--ink);border-radius:12px;box-shadow:3px 3px 0 var(--ink);padding:.3em .7em;cursor:pointer}
+.tok:hover:not(:disabled){background:var(--lilac)}
+.tok.sel{background:var(--sun)}
+.tok:disabled{cursor:default}
+.tok.right{box-shadow:none}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px 22px;margin:1em 0}
+.cols .opts{margin:0}
+.cols .tok{width:100%;text-align:left;font-weight:normal}
+.cols .opts:first-child .tok{font-weight:bold}
+.fb{display:flex;gap:14px;align-items:flex-start;border:3px solid var(--ink);border-radius:16px;padding:12px 16px;margin-top:16px}
+.fb .svg{width:74px;height:60px;flex:none}
+.fb.ok{background:var(--okbg)}.fb.err{background:var(--errbg)}
+.fb strong{font-size:1.2em}
+.shake{animation:shake .35s}
+@keyframes shake{25%{transform:translateX(-7px)}50%{transform:translateX(7px)}75%{transform:translateX(-4px)}}
+.combo{background:var(--orange);animation:pop .3s}
+
+/* resultado, relatório, progresso */
+.center{text-align:center}
+.result .svg.bit{width:130px;height:104px;margin:0 auto}
+.bigword{font-size:2em;font-weight:bold;letter-spacing:.06em;line-height:1.2}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:16px 0}
+.tile{border:3px solid var(--ink);border-radius:16px;padding:12px 14px;background:var(--lilac)}
+.tile b{display:block;font-size:1.7em;line-height:1.1}
+.tile:nth-child(3n+1){background:var(--sun)}.tile:nth-child(3n+2){background:var(--sky)}.tile:nth-child(3n){background:var(--mint)}
+.skill{display:grid;grid-template-columns:11em 1fr 5em;gap:10px;align-items:center;margin:.5em 0}
+.skill .xpbar i{background:var(--pink)}
+table.rep{border-collapse:collapse;width:100%;margin:.8em 0}
+table.rep th,table.rep td{text-align:left;padding:7px 10px;border-bottom:2px solid var(--lilac);vertical-align:top}
+table.rep thead th{border-bottom:3px solid var(--ink)}
+.status{padding:10px 14px;border:3px solid var(--ink);border-radius:12px;background:var(--lilac);margin:.8em 0;font-weight:bold}
+.status.ok{background:var(--okbg)}.status.warn{background:#FFF3B0}
+.badges{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:12px;margin-top:12px}
+.badge{text-align:center;border:3px solid var(--ink);border-radius:16px;padding:10px 8px;background:var(--sun);font-weight:bold;font-size:.92em;line-height:1.25}
+.badge .svg{width:46px;height:46px;margin:0 auto 4px;display:block}
+.badge.off{background:var(--off);color:var(--muted);font-weight:normal}
+.flash{font:inherit;color:var(--ink);display:block;width:100%;min-height:9em;border:3px solid var(--ink);border-radius:20px;box-shadow:6px 6px 0 var(--ink);background:var(--sky);font-size:1.7em;font-weight:bold;cursor:pointer;padding:20px;margin-top:14px}
+.flash.back{background:var(--sun)}
+.flash small{display:block;font-size:.5em;font-weight:normal;margin-top:.8em}
+#confetti{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:9}
+#confetti i{position:absolute;top:-20px;width:12px;height:18px;border:2px solid var(--ink);animation:fall 1.9s linear forwards}
+@keyframes fall{to{transform:translateY(110vh) rotate(720deg)}}
+footer{margin-top:36px;color:#fff;font-size:.85em;opacity:.9}
+@media (max-width:640px){
+  .hero{flex-direction:column;align-items:flex-start}.hero h1{font-size:2.2em}
+  .cols,.opts.two{grid-template-columns:1fr}
+  .trail::before{display:none}.trail{justify-content:center}.node:nth-child(even){margin-top:0}
+  .world .banner .svg{display:none}
+  .skill{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div id="confetti" aria-hidden="true"></div>
+<div class="wrap">
+  <main id="app"></main>
+  <noscript>Este jogo precisa de JavaScript ativado no navegador.</noscript>
+  <footer>Dev English Quest. Projeto Edutec, Técnico em Desenvolvimento de Sistemas. NovaByte é uma empresa fictícia criada para o jogo.</footer>
+</div>
+<script>
+"use strict";
+/* =====================================================================
+   CONFIGURAÇÃO DA PROFESSORA
+   1) ENDPOINT_URL:https://script.google.com/macros/s/AKfycbyMrMoPIXJ1HIZhdIHA-eII058bxUma58sYV4Txs8CSqQ6tbqlVztb5vBtDguIRgvPx/exec
+   2) FORMA_TESTE: 1 = teste do início do período; 2 = teste do fim do período.
+   ===================================================================== */
+const CONFIG = {
+  ENDPOINT_URL:https://script.google.com/macros/s/AKfycbyMrMoPIXJ1HIZhdIHA-eII058bxUma58sYV4Txs8CSqQ6tbqlVztb5vBtDguIRgvPx/exec,
+  FORMA_TESTE: 1
+};
+/* Faixas do teste, pelo percentual de acertos (ajuste se quiser). */
+const BANDS = [
+  {id:0, nome:"A1 - Iniciante", min:0},
+  {id:1, nome:"A2 - Básico", min:40},
+  {id:2, nome:"B1 - Intermediário", min:65},
+  {id:3, nome:"B1+ - Intermediário avançado", min:85}
+];
+/* Estrelas por fase, pelo percentual de acertos: 3, 2 e 1 estrela. */
+const STAR_MIN = [0.85, 0.70, 0.55];
+
+/* ============================ TESTE DE NÍVEL ============================
+   Em cada questão, a PRIMEIRA opção da lista é a correta (o jogo embaralha).
+   b = bloco (1 = A1, 2 = A2, 3 = B1) · s = habilidade                      */
+const SK = {VG:"Vocabulário geral", VT:"Vocabulário de TI", G:"Gramática", R:"Leitura"};
+const T = (b,s,q,o,x) => Object.assign({b,s,q,o}, x||{});
+const TESTS = {
+1: [
+  T(1,"VG","Monday, Tuesday, ___, Thursday.",["Wednesday","Friday","Saturday","Sunday"]),
+  T(1,"VG","Choose the opposite of \"big\".",["small","long","old","tall"]),
+  T(1,"VT","Which device do you use to type?",["keyboard","mouse","screen","speaker"]),
+  T(1,"VT","You want to keep your work in a document. You click:",["Save","Close","Delete","Print"]),
+  T(1,"G","She ___ a programmer.",["is","am","are","be"]),
+  T(1,"G","We ___ two computers in the lab.",["have","has","having","is"]),
+  T(1,"R","What does Lucas like?",["Games","Music","School","Sports"],{ctx:"Hi! My name is Lucas. I am 16 years old. I study at a technical school and I like games."}),
+  T(1,"R","What do you need to enter the system?",["A username and a password","A file and a folder","A mouse and a keyboard","A name and an address"],{k:"code",ctx:"Username: ________\nPassword: ________\n[ Log in ]"}),
+  T(2,"VG","I can't hear the video. Can you turn up the ___?",["volume","light","page","screen"]),
+  T(2,"VG","We don't have classes on Saturday and Sunday. I love the ___!",["weekend","holiday","morning","weekday"]),
+  T(2,"VT","To get a file from the internet to your computer, you ___ it.",["download","delete","print","upload"]),
+  T(2,"VT","A ___ is a secret word you use to log in.",["password","folder","keyboard","username"]),
+  T(2,"G","Yesterday I ___ a new program.",["installed","install","installing","installs"]),
+  T(2,"G","There aren't ___ files in this folder.",["any","a","much","some"]),
+  T(2,"R","When can students use the lab again?",["On Monday morning","On Friday morning","On Friday night","On Sunday at 8 a.m."],{ctx:"Notice: The computer lab will be closed on Friday for maintenance. It will open again on Monday at 8 a.m."}),
+  T(2,"R","Which password is accepted?",["blue2024sky","bluesky","password","sky2024"],{k:"code",ctx:"Your password must have at least 8 characters and one number."}),
+  T(3,"VG","She has a lot of ___ in customer service. She has worked in the area for five years.",["experience","expectation","experiment","explanation"]),
+  T(3,"VG","The instructions were not clear, so many students got ___ and made mistakes.",["confused","confident","excited","relaxed"]),
+  T(3,"VT","A ___ is a mistake in the code that makes a program behave incorrectly.",["bug","backup","feature","update"]),
+  T(3,"VT","Before changing the database, make a ___ so you don't lose any data.",["backup","bug","crash","login"]),
+  T(3,"G","If the server ___ down, we will lose the connection.",["goes","going","went","will go"]),
+  T(3,"G","This software ___ by millions of people every day.",["is used","is using","used","uses"]),
+  T(3,"R","What has the user already tried?",["Restarting the phone","Attaching a smaller photo","Reinstalling the app","Updating the app again"],{ctx:"Ticket #482\nSince the last update, the app closes when I try to attach a photo. It worked fine last week. I have already restarted my phone, but the problem continues."}),
+  T(3,"R","What should developers do?",["Start using getUser()","Keep using the old function","Remove version 3.0","Wait for version 3.0"],{k:"code",ctx:"Note: This function is deprecated and will be removed in version 3.0. Use getUser() instead."})
+],
+2: [
+  T(1,"VG","January, February, ___, April.",["March","June","May","Monday"]),
+  T(1,"VG","Choose the opposite of \"hot\".",["cold","dry","new","warm"]),
+  T(1,"VT","Which device shows images and text?",["screen","keyboard","mouse","speaker"]),
+  T(1,"VT","You don't need a file anymore. To remove it, you click:",["Delete","Copy","Open","Save"]),
+  T(1,"G","They ___ students.",["are","am","be","is"]),
+  T(1,"G","He ___ a new laptop.",["has","are","have","having"]),
+  T(1,"R","What is Ana's favorite subject?",["Math","English","History","Science"],{ctx:"Hello! I'm Ana. I'm 15 and I live in Rio. My favorite subject is math."}),
+  T(1,"R","What do you do after typing your e-mail?",["Click Next","Click Back","Close the window","Type your password"],{k:"code",ctx:"Enter your e-mail and click Next.\nE-mail: ________\n[ Back ]  [ Next ]"}),
+  T(2,"VG","It's very dark in here. Can you turn on the ___?",["light","chair","door","volume"]),
+  T(2,"VG","I usually have ___ at 7 a.m., before I go to school.",["breakfast","dinner","homework","lunch"]),
+  T(2,"VT","To send a file from your computer to a website, you ___ it.",["upload","delete","download","print"]),
+  T(2,"VT","A ___ is the name you use to identify yourself when you log in.",["username","file","password","screen"]),
+  T(2,"G","Last week we ___ a new keyboard.",["bought","buy","buying","buys"]),
+  T(2,"G","Is there ___ paper in the printer?",["any","a","an","many"]),
+  T(2,"R","What should people do on Tuesday afternoon?",["Use the cable network","Stay at home","Turn off their computers","Use the Wi-Fi after 1 p.m."],{ctx:"Notice: The Wi-Fi will be unavailable on Tuesday from 1 p.m. to 3 p.m. Please use the cable network during this time."}),
+  T(2,"R","Which username is accepted?",["marina","ana","maria silva","marina99"],{k:"code",ctx:"Your username must have between 5 and 10 letters. Numbers and spaces are not allowed."}),
+  T(3,"VG","We need more ___ about the problem before we can find a solution.",["information","imagination","instruction","invitation"]),
+  T(3,"VG","The task was really ___: nobody in the class could finish it in time.",["challenging","careless","comfortable","convenient"]),
+  T(3,"VT","A new ___ is a function added to a program to make it more useful.",["feature","bug","crash","password"]),
+  T(3,"VT","After the latest ___, the app has a new design and runs faster.",["update","backup","keyboard","username"]),
+  T(3,"G","If you ___ the wrong password three times, the account will be blocked.",["type","typed","typing","will type"]),
+  T(3,"G","The website ___ last night by the support team.",["was fixed","fixed","fixes","is fixing"]),
+  T(3,"R","What do we know about the printer?",["It works with other computers","It is new","It is not connected","It stopped working for everyone"],{ctx:"Ticket #517\nI can't print from my laptop since yesterday. The printer works with other computers. I have already checked the cable and it is connected."}),
+  T(3,"R","What should you do before running the command?",["Copy the files","Delete the folder","Run it twice","Undo the action"],{k:"code",ctx:"Warning: This command permanently deletes all files in the folder. This action cannot be undone. Make a copy before you continue."})
+]};
+
+/* ============================== MUNDOS ================================
+   t = tipo (mc, match, type, order, spot) · q = pergunta · o = opções (1ª = correta)
+   ctx = texto em inglês (k:"code" = tela de terminal) · e = explicação · c = carta [inglês, português]
+   h = dica do Modo B · pairs = pares · ans = respostas aceitas · w = palavras · a = índice da palavra errada */
+const TASK1 = "Maya: Hi! Your first task:\n1) Log in to the system.\n2) Open the folder \"Clients\".\n3) Download the file \"list.pdf\".\n4) Rename it to \"clients_2026.pdf\".\n5) Send it to me as an attachment.\nThank you!";
+const TICKET = "Ticket #101 - From: Sarah (client)\nHello, I cannot log in. The system shows: \"Invalid password\". I tried three times and now my account is locked. Please help.";
+const WORLDS = [
+{id:1, name:"Onboarding", role:"Intern (estagiário)", desc:"Seu primeiro dia na NovaByte: cumprimentos, equipamentos, botões e arquivos.", phases:[
+ {id:"1.1", ic:"chat", name:"Welcome aboard", intro:{en:"Hi! I'm Maya, your team leader at NovaByte. Welcome aboard! Let's meet the team.", pt:"Treine cumprimentos e apresentações."}, items:[
+  {q:"Qual é a melhor resposta?", ctx:"Maya: Good morning! Welcome to the team. How are you?", o:["I'm fine, thanks. And you?","I'm 15 years old.","My name is fine.","Yes, I do."], e:"\"How are you?\" pergunta como você está. A resposta comum é \"I'm fine, thanks\".", c:["How are you?","Como você está?"], h:"A pergunta é sobre como você está, não sobre idade ou nome."},
+  {t:"match", q:"Ligue cada expressão à tradução.", pairs:[["Good morning","Bom dia"],["Nice to meet you","Prazer em conhecer você"],["See you tomorrow","Até amanhã"],["Thank you","Obrigado(a)"],["Welcome","Bem-vindo(a)"]]},
+  {t:"order", q:"Monte a frase: \"Meu nome é Ana e eu sou a nova estagiária.\"", w:["My","name","is","Ana","and","I","am","the","new","intern"], e:"Em inglês, o adjetivo vem antes do substantivo: \"new intern\".", c:["intern","estagiário(a)"]},
+  {q:"Quem é Maya?", ctx:"Maya: Nice to meet you. I'm Maya, your team leader.", o:["A líder da sua equipe","A nova estagiária","A professora","Uma cliente"], e:"\"Team leader\" é a pessoa que lidera a equipe.", c:["team leader","líder de equipe"]},
+  {q:"Qual é a melhor resposta?", ctx:"Maya: Where are you from?", o:["I'm from Brazil.","I'm 16.","I'm a student.","I'm fine."], e:"\"Where are you from?\" pergunta de onde você é.", c:["Where are you from?","De onde você é?"], h:"Where = onde."},
+  {t:"type", q:"Digite em inglês: \"equipe\"", ans:["team"], e:"Team = equipe. Exemplo: \"support team\" (equipe de suporte).", c:["team","equipe"]},
+  {q:"Complete a frase.", ctx:"This ___ João. He is a developer.", o:["is","am","are","be"], e:"Com he, she, it e this usamos \"is\"."},
+  {q:"Como se despedir no fim do expediente?", o:["See you tomorrow!","Good morning!","Nice to meet you!","You're welcome!"], e:"\"See you tomorrow\" = até amanhã.", c:["See you tomorrow","Até amanhã"]}
+ ]},
+ {id:"1.2", ic:"monitor", name:"Your workstation", intro:{en:"This is your desk. Let's check your equipment.", pt:"Conheça os nomes dos equipamentos da sua mesa."}, items:[
+  {t:"match", q:"Ligue cada equipamento à tradução.", pairs:[["screen","tela"],["keyboard","teclado"],["headphones","fones de ouvido"],["charger","carregador"],["printer","impressora"]]},
+  {q:"O que você faz?", ctx:"Maya: Plug in the charger, please.", o:["Conecta o carregador na tomada","Compra um carregador","Desliga o computador","Guarda o carregador na gaveta"], e:"\"Plug in\" = conectar na tomada ou em uma entrada.", c:["plug in","conectar (na tomada)"], h:"Charger = carregador."},
+  {t:"type", q:"Digite em inglês: \"teclado\"", ans:["keyboard"], e:"Keyboard = teclado (key = tecla, board = placa).", c:["keyboard","teclado"]},
+  {q:"O que Maya pediu?", ctx:"Maya: Turn on the computer and put on your headphones.", o:["Ligar o computador e colocar os fones","Desligar o computador e guardar os fones","Ligar a impressora e colocar os fones","Reiniciar o computador e tirar os fones"], e:"\"Turn on\" = ligar. \"Put on\" = colocar.", c:["turn on","ligar"]},
+  {q:"Complete a frase.", ctx:"The ___ is not working. I can't print the report.", o:["printer","charger","keyboard","screen"], e:"Para imprimir (print), usamos a impressora (printer).", c:["printer","impressora"], h:"Print = imprimir."},
+  {t:"spot", q:"Uma palavra não combina com a frase. Clique nela.", w:["I","use","the","printer","to","type","my","password."], a:3, e:"Para digitar (type), usamos o teclado: \"I use the keyboard to type my password.\""},
+  {q:"\"Turn off\" é o contrário de:", o:["turn on","log out","plug in","shut down"], e:"Turn on = ligar. Turn off = desligar. \"Shut down\" também significa desligar.", c:["turn off","desligar"]},
+  {t:"order", q:"Monte a frase: \"A tela está muito escura.\"", w:["The","screen","is","very","dark"], e:"Screen = tela. Dark = escuro(a).", c:["screen","tela"]}
+ ]},
+ {id:"1.3", ic:"cursor", name:"Buttons and menus", intro:{en:"Now open the system. Do you know all the buttons?", pt:"Botões e menus que aparecem em quase todo sistema."}, items:[
+  {t:"match", q:"Ligue cada botão à tradução.", pairs:[["Save","Salvar"],["Delete","Excluir"],["Search","Pesquisar"],["Settings","Configurações"],["Share","Compartilhar"]]},
+  {q:"Você quer enviar uma foto do seu computador para o site. Qual botão?", k:"code", ctx:"[ Upload ]   [ Download ]   [ Delete ]   [ Search ]", o:["Upload","Delete","Download","Search"], e:"Upload = enviar do computador para a internet. Download = baixar da internet para o computador.", c:["upload","enviar (do computador para a internet)"], h:"Up = para cima. Down = para baixo."},
+  {q:"Você terminou de usar o sistema e quer sair da sua conta. Clique em:", o:["Log out","Log in","Save","Sign up"], e:"Log in = entrar na conta. Log out = sair da conta.", c:["log out","sair da conta"]},
+  {t:"type", q:"Digite em inglês: \"configurações\"", ans:["settings"], e:"Settings = configurações. Costuma aparecer com o ícone de engrenagem.", c:["settings","configurações"]},
+  {q:"O que você deve fazer?", ctx:"Maya: Click the search button and type the name of the file.", o:["Clicar em pesquisar e digitar o nome do arquivo","Clicar em excluir e digitar a senha","Clicar em pesquisar e apagar o arquivo","Clicar em salvar e digitar o nome do arquivo"], e:"Search = pesquisar. Type = digitar. File = arquivo.", c:["search","pesquisar"]},
+  {t:"spot", q:"A mensagem do sistema tem uma palavra errada. Clique nela.", w:["Click","Delete","to","keep","your","changes."], a:1, e:"Para manter (keep) as alterações, clicamos em Save: \"Click Save to keep your changes.\"", c:["changes","alterações"]},
+  {q:"\"Sign up\" significa:", o:["criar uma conta","apagar a conta","entrar na conta","sair da conta"], e:"Sign up = cadastrar-se. Log in (ou sign in) = entrar em uma conta que já existe.", c:["sign up","criar uma conta"]},
+  {q:"O que essa mensagem pergunta?", k:"code", ctx:"Are you sure you want to delete this file?\n[ Cancel ]   [ OK ]", o:["Se você tem certeza de que quer excluir o arquivo","Se você quer abrir o arquivo","Se você quer renomear o arquivo","Se você quer salvar o arquivo"], e:"\"Are you sure?\" = Tem certeza? Leia antes de clicar em OK.", c:["Are you sure?","Tem certeza?"], h:"Delete = excluir."}
+ ]},
+ {id:"1.4", ic:"folder", name:"Files and folders", intro:{en:"Time to organize your files and folders.", pt:"Arquivos, pastas, senhas e anexos."}, items:[
+  {t:"match", q:"Ligue cada palavra à tradução.", pairs:[["file","arquivo"],["folder","pasta"],["password","senha"],["username","nome de usuário"],["attachment","anexo"]]},
+  {t:"order", q:"Monte a frase: \"Salve o arquivo na pasta do projeto.\"", w:["Save","the","file","in","the","project","folder"], e:"\"Project folder\" = pasta do projeto. A palavra principal (folder) vem por último.", c:["folder","pasta"]},
+  {q:"O que Maya pede?", ctx:"Maya: Can you rename the file to report_final?", o:["Mudar o nome do arquivo","Apagar o arquivo","Copiar o arquivo","Enviar o arquivo"], e:"Rename = renomear (re + name).", c:["rename","renomear"], h:"Name = nome."},
+  {t:"type", q:"Digite em inglês: \"pasta\" (de arquivos)", ans:["folder"], e:"Folder = pasta. File = arquivo.", c:["folder","pasta"]},
+  {q:"Complete a frase.", ctx:"The files are ___ the folder.", o:["in","at","of","to"], e:"\"In\" = dentro de. Os arquivos estão dentro da pasta."},
+  {t:"type", q:"Digite em inglês: \"senha\"", ans:["password"], e:"Password = senha (pass = passar, word = palavra).", c:["password","senha"]},
+  {q:"Complete a frase.", ctx:"Copy and ___ the text into the document.", o:["paste","pass","past","post"], e:"Copy and paste = copiar e colar. Cuidado: \"past\" significa passado.", c:["copy and paste","copiar e colar"]},
+  {q:"Como enviar o relatório?", ctx:"Maya: Please send me the report as an attachment.", o:["Como anexo no e-mail","Como link de um site","Impresso em papel","Por mensagem de voz"], e:"Attachment = anexo. Report = relatório.", c:["attachment","anexo"], h:"Report = relatório."}
+ ]},
+ {id:"1.B", ic:"trophy", name:"Desafio: First task", boss:true, intro:{en:"You are ready for your first real task. Read my instructions carefully.", pt:"Desafio final do Mundo 1: siga as instruções da Maya."}, items:[
+  {q:"Qual é o primeiro passo?", ctx:TASK1, o:["Entrar no sistema","Abrir a pasta","Baixar o arquivo","Enviar um e-mail"], e:"Passo 1: \"Log in to the system\" = entrar no sistema."},
+  {q:"Qual pasta você deve abrir?", ctx:TASK1, o:["Clients","list","Maya","System"], e:"Passo 2: Open the folder \"Clients\"."},
+  {q:"O que fazer primeiro com o arquivo list.pdf?", ctx:TASK1, o:["Baixar","Compartilhar","Excluir","Imprimir"], e:"Passo 3: \"Download the file\" = baixar o arquivo.", c:["download","baixar"]},
+  {q:"Qual será o novo nome do arquivo?", ctx:TASK1, o:["clients_2026.pdf","Clients_list.pdf","clients.pdf","list_2026.pdf"], e:"Passo 4: Rename it to \"clients_2026.pdf\"."},
+  {t:"order", q:"Monte a resposta para Maya: \"O arquivo está no seu e-mail.\"", w:["The","file","is","in","your","e-mail"], e:"Your = seu, sua."},
+  {t:"type", q:"Digite em inglês: \"baixar\" (um arquivo da internet)", ans:["download"], e:"Download = baixar. Upload = enviar.", c:["download","baixar"]},
+  {q:"O que acontece amanhã?", ctx:"Maya: Great job! Tomorrow you will meet the support team.", o:["Você vai conhecer a equipe de suporte","Você vai apresentar um trabalho","Você vai fazer uma prova","Você vai trocar de computador"], e:"\"You will meet\" = você vai conhecer. Support team = equipe de suporte.", c:["support team","equipe de suporte"]},
+  {t:"spot", q:"A instrução tem uma palavra errada. Clique nela.", w:["Please","log","out","before","you","start","working."], a:2, e:"Antes de começar a trabalhar, você entra no sistema: \"log in\"."},
+  {t:"match", q:"Ligue cada ação à tradução.", pairs:[["turn on","ligar"],["turn off","desligar"],["plug in","conectar na tomada"],["log in","entrar na conta"],["sign up","criar uma conta"]]},
+  {q:"Qual é a melhor resposta?", ctx:"Maya: Thank you!", o:["You're welcome!","Good morning!","I'm fine.","Nice to meet you!"], e:"\"You're welcome\" = de nada.", c:["You're welcome","De nada"]}
+ ]}
+]},
+{id:2, name:"Error messages", role:"Trainee (em treinamento)", desc:"Você começa a ajudar o suporte: leia e entenda mensagens de erro reais.", phases:[
+ {id:"2.1", ic:"warning", name:"Something went wrong", intro:{en:"Today you start helping the support team. Systems talk to us with messages. Let's read them.", pt:"As mensagens de erro mais comuns."}, items:[
+  {t:"match", q:"Ligue cada mensagem à tradução.", pairs:[["File not found","Arquivo não encontrado"],["Access denied","Acesso negado"],["Invalid password","Senha inválida"],["Connection lost","Conexão perdida"],["Try again","Tente novamente"]]},
+  {q:"O que aconteceu?", k:"code", ctx:"Error: File not found.", o:["O sistema não encontrou o arquivo","O arquivo está aberto em outro programa","O arquivo está muito grande","O arquivo foi salvo"], e:"Not found = não encontrado.", c:["file not found","arquivo não encontrado"], h:"Found = encontrado."},
+  {q:"O que você deve fazer?", k:"code", ctx:"Invalid username or password. Try again.", o:["Conferir o usuário e a senha e tentar de novo","Criar uma conta nova","Esperar 24 horas","Reiniciar o computador"], e:"A mensagem diz que o usuário ou a senha está inválido e pede para tentar de novo.", c:["try again","tente novamente"]},
+  {t:"type", q:"Digite em inglês: \"negado\" (como em \"acesso negado\")", ans:["denied"], e:"Access denied = acesso negado.", c:["denied","negado"]},
+  {q:"O que a mensagem diz?", k:"code", ctx:"Connection lost. Please check your network.", o:["A conexão caiu; verifique a rede","A senha expirou; troque a senha","O arquivo sumiu; procure na pasta","O computador desligou; ligue de novo"], e:"Connection lost = conexão perdida. Network = rede.", c:["network","rede"]},
+  {q:"Com a mensagem \"Something went wrong\", o sistema diz que:", o:["algo deu errado","alguém entrou na conta","nada foi encontrado","tudo foi salvo"], e:"Something = algo. \"Went wrong\" = deu errado.", c:["Something went wrong","Algo deu errado"]},
+  {q:"\"Not found\" significa:", o:["não encontrado","não conectado","não permitido","não salvo"], e:"Found vem do verbo \"find\" (encontrar).", c:["not found","não encontrado"]},
+  {t:"spot", q:"A mensagem tem uma palavra errada. Clique nela.", w:["Access","denied:","you","can","open","this","folder."], a:3, e:"Se o acesso foi negado, você não pode abrir: \"you cannot open this folder\".", c:["access denied","acesso negado"]}
+ ]},
+ {id:"2.2", ic:"lock", name:"Can or cannot", intro:{en:"Some messages say what you can and cannot do.", pt:"Can, cannot e must nas mensagens do sistema."}, items:[
+  {q:"Complete a frase.", k:"code", ctx:"Access denied. You ___ open this file.", o:["cannot","are","can","do"], e:"Cannot (ou can't) = não pode, não consegue.", c:["cannot","não pode / não consegue"], h:"Denied = negado."},
+  {q:"A frase abaixo indica:", k:"code", ctx:"You must change your password.", o:["uma obrigação","um elogio","uma proibição","uma sugestão opcional"], e:"Must = dever. Você é obrigado a trocar a senha.", c:["must","dever (obrigação)"]},
+  {t:"order", q:"Monte a frase: \"Você não pode excluir este arquivo.\"", w:["You","cannot","delete","this","file"], e:"Depois de can ou cannot, o verbo fica na forma simples: \"cannot delete\"."},
+  {q:"Complete a frase.", k:"code", ctx:"The disk is full. You ___ save more files.", o:["cannot","are","can","must"], e:"Disco cheio (full): você não pode salvar mais arquivos.", c:["full","cheio"], h:"Full = cheio."},
+  {q:"O que você pode fazer com este arquivo?", k:"code", ctx:"report.docx (read-only file)", o:["Só ler, sem alterar","Ler e alterar","Só excluir","Só renomear"], e:"Read-only = somente leitura.", c:["read-only","somente leitura"], h:"Read = ler. Only = somente."},
+  {q:"O que a mensagem diz?", k:"code", ctx:"You don't have permission to install this program.", o:["Você não tem permissão para instalar o programa","O programa já está instalado","Você pode instalar o programa agora","Você precisa atualizar o programa"], e:"\"You don't have permission\" = você não tem permissão.", c:["permission","permissão"]},
+  {q:"Complete a frase.", k:"code", ctx:"Your password ___ have at least 8 characters.", o:["must","cannot","does","is"], e:"Must = deve. \"At least\" = pelo menos.", c:["at least","pelo menos"]},
+  {t:"type", q:"Complete com a palavra que falta (\"não\"): You do ___ have permission.", ans:["not"], e:"Do not (ou don't) faz a negativa: \"You do not have permission\"."}
+ ]},
+ {id:"2.3", ic:"magnifier", name:"Read the error", intro:{en:"These are real error messages from Python, MySQL and the terminal. Don't panic: read them!", pt:"Erros reais de Python, MySQL e terminal."}, items:[
+  {q:"O que o Python está dizendo?", k:"code", ctx:">>> print(total)\nNameError: name 'total' is not defined", o:["O nome 'total' não foi definido","O comando print não existe","O nome 'total' está repetido","O valor de 'total' é zero"], e:"\"Is not defined\" = não está definido. A variável total não foi criada antes do print.", c:["is not defined","não está definido"], h:"Name = nome."},
+  {q:"Qual é o problema?", k:"code", ctx:"ZeroDivisionError: division by zero", o:["O código tentou dividir por zero","A divisão demorou demais","O código não tem divisão","O resultado da divisão é zero"], e:"\"Division by zero\" = divisão por zero.", h:"By = por."},
+  {q:"O que o MySQL informa?", k:"code", ctx:"ERROR 1045 (28000): Access denied for user 'root'@'localhost' (using password: YES)", o:["O acesso do usuário root foi negado","A senha do root foi alterada","O servidor localhost foi desligado","O usuário root foi excluído"], e:"\"Access denied for user\" = acesso negado para o usuário. Confira o usuário e a senha.", c:["access denied","acesso negado"]},
+  {q:"O que o MySQL informa?", k:"code", ctx:"ERROR 1146 (42S02): Table 'loja.clientes' doesn't exist", o:["A tabela clientes não existe no banco loja","A tabela clientes está duplicada","A tabela clientes está vazia","O banco loja foi apagado"], e:"\"Doesn't exist\" = não existe.", c:["doesn't exist","não existe"], h:"Table = tabela."},
+  {q:"Por que o erro apareceu?", k:"code", ctx:"$ pyhton app.py\nbash: pyhton: command not found", o:["O comando foi digitado errado (pyhton)","O arquivo app.py não foi salvo","O Python está desatualizado","O terminal está sem internet"], e:"\"Command not found\" = comando não encontrado. O terminal não conhece \"pyhton\"; o certo é \"python\".", c:["command not found","comando não encontrado"]},
+  {t:"match", q:"Ligue cada palavra de erro à tradução.", pairs:[["invalid","inválido"],["missing","faltando"],["unexpected","inesperado"],["unknown","desconhecido"],["duplicate","duplicado"]]},
+  {q:"O que o MySQL informa?", k:"code", ctx:"ERROR 1054 (42S22): Unknown column 'nome' in 'field list'", o:["O MySQL não conhece a coluna 'nome'","A coluna 'nome' está duplicada","A coluna 'nome' está vazia","A lista de campos está cheia"], e:"Unknown = desconhecido(a). Column = coluna.", c:["unknown","desconhecido"]},
+  {q:"O que o Python informa?", k:"code", ctx:">>> x = = 5\nSyntaxError: invalid syntax", o:["A linha foi escrita de um jeito que o Python não entende","A variável x não existe","O número 5 é inválido","O Python precisa ser atualizado"], e:"Invalid syntax = sintaxe inválida. Há um erro de escrita no código: aqui, dois sinais de igual separados.", c:["invalid syntax","sintaxe inválida"]}
+ ]},
+ {id:"2.4", ic:"bulb", name:"What should I do?", intro:{en:"Reading the error is step one. Step two: decide what to do.", pt:"Leia o erro e escolha o próximo passo."}, items:[
+  {q:"Qual é o próximo passo mais lógico?", k:"code", ctx:"ModuleNotFoundError: No module named 'requests'", o:["Instalar o módulo requests","Apagar o arquivo Python","Reiniciar o roteador","Trocar a senha"], e:"\"No module named\" = nenhum módulo com esse nome. O módulo não está instalado.", c:["module","módulo"]},
+  {q:"Qual é o próximo passo mais lógico?", k:"code", ctx:"FileNotFoundError: [Errno 2] No such file or directory: 'dados.csv'", o:["Conferir o nome e a pasta do arquivo dados.csv","Aumentar a memória do computador","Criar um novo usuário","Instalar o Python de novo"], e:"\"No such file or directory\" = não existe esse arquivo ou pasta.", c:["No such file or directory","Arquivo ou pasta inexistente"], h:"Directory = diretório (pasta)."},
+  {q:"O que esse código de resposta da web indica?", k:"code", ctx:"404 Not Found", o:["A página não foi encontrada","A página foi carregada","O acesso é proibido","O servidor teve um erro interno"], e:"404 Not Found = página não encontrada."},
+  {q:"\"Retry\" significa:", k:"code", ctx:"Connection timed out.\n[ Retry ]   [ Cancel ]", o:["tentar novamente","cancelar","sair","salvar"], e:"Retry = re + try (tentar de novo). \"Timed out\" = o tempo acabou.", c:["retry","tentar novamente"], h:"Try = tentar."},
+  {t:"order", q:"Monte a frase: \"O servidor não está respondendo.\"", w:["The","server","is","not","responding"], e:"\"Is not responding\" = não está respondendo.", c:["server","servidor"]},
+  {q:"O que o Python esperava encontrar?", k:"code", ctx:"IndentationError: expected an indented block", o:["Um bloco com recuo (indentação)","Um bloco sem espaços","Um nome de variável","Um ponto e vírgula"], e:"Expected = esperado. \"Indented block\" = bloco com recuo.", c:["expected","esperado"]},
+  {q:"O que a mensagem diz?", k:"code", ctx:"The update failed. Please restart the application and try again.", o:["A atualização falhou; reinicie o aplicativo e tente de novo","A atualização começou; aguarde","A atualização terminou; feche o aplicativo","O aplicativo foi excluído; instale de novo"], e:"Failed = falhou. Restart = reiniciar.", c:["failed","falhou"]},
+  {q:"O que o Git informa?", k:"code", ctx:"fatal: not a git repository (or any of the parent directories): .git", o:["A pasta atual não é um repositório Git","O arquivo .git está corrompido","O Git não está instalado","O repositório está cheio"], e:"\"Not a git repository\" = não é um repositório Git. Falta entrar na pasta certa ou rodar git init.", c:["repository","repositório"]}
+ ]},
+ {id:"2.B", ic:"bug", name:"Desafio: Bug hunt", boss:true, intro:{en:"A client needs help and the bugs are everywhere. Show what you learned!", pt:"Desafio final do Mundo 2: chamado de cliente e erros misturados."}, items:[
+  {q:"Qual é o problema da cliente?", ctx:TICKET, o:["Ela não consegue entrar no sistema","Ela não consegue imprimir","Ela perdeu um arquivo","Ela quer criar uma conta"], e:"\"I cannot log in\" = não consigo entrar."},
+  {q:"\"My account is locked\" significa:", ctx:TICKET, o:["A conta está bloqueada","A conta é nova","A conta está aberta","A conta foi excluída"], e:"Locked = bloqueado(a), trancado(a).", c:["locked","bloqueado(a)"], h:"Lock = cadeado, trancar."},
+  {q:"Quantas vezes ela tentou entrar?", ctx:TICKET, o:["Três","Duas","Quatro","Uma"], e:"\"I tried three times\" = tentei três vezes.", c:["three times","três vezes"]},
+  {t:"order", q:"Monte a resposta: \"Nós vamos redefinir a sua senha.\"", w:["We","will","reset","your","password"], e:"Will indica futuro. Reset = redefinir.", c:["reset","redefinir"]},
+  {q:"O erro acontece porque o código tentou:", k:"code", ctx:"TypeError: can only concatenate str (not \"int\") to str", o:["juntar texto com número inteiro","abrir um arquivo inexistente","dividir um texto por zero","usar uma variável sem nome"], e:"\"Can only concatenate str to str\" = só é possível juntar texto com texto. str = texto; int = número inteiro.", h:"Only = somente."},
+  {q:"O que o MySQL informa?", k:"code", ctx:"ERROR 1062 (23000): Duplicate entry '1' for key 'PRIMARY'", o:["Já existe um registro com a chave primária 1","A chave primária 1 não existe","A tabela não tem chave primária","O registro 1 foi apagado"], e:"\"Duplicate entry\" = registro duplicado. A chave primária não pode se repetir.", c:["duplicate entry","registro duplicado"]},
+  {q:"O que a mensagem diz?", k:"code", ctx:"Access denied. You must log in as an administrator.", o:["Acesso negado; é preciso entrar como administrador","Acesso liberado; entre com qualquer conta","Acesso liberado; você é administrador","Acesso negado; a senha expirou"], e:"Must = é preciso. \"As an administrator\" = como administrador."},
+  {t:"type", q:"Digite em inglês: \"tentar novamente\" (uma palavra só)", ans:["retry"], e:"Retry = tentar novamente.", c:["retry","tentar novamente"]},
+  {t:"spot", q:"A mensagem tem uma palavra que não faz sentido. Clique nela.", w:["Connection","lost.","Please","check","your","keyboard","and","try","again."], a:5, e:"Se a conexão caiu, o sistema pede para verificar a rede: \"check your network\"."},
+  {q:"O que o Python informa?", k:"code", ctx:"IndexError: list index out of range", o:["O código pediu uma posição que não existe na lista","A lista está em ordem errada","A lista tem itens repetidos","O código apagou a lista"], e:"\"Out of range\" = fora do intervalo. O índice pedido não existe na lista.", c:["out of range","fora do intervalo"]}
+ ]}
+]}
+];
+const COMING = ["Mundo 3: Code and docs", "Mundo 4: Support tickets", "Mundo 5: Team chat", "Mundo 6: Job ready"];
+const PHASE_IDS = [], PHASE_BY_ID = {};
+WORLDS.forEach(w => w.phases.forEach(p => { PHASE_IDS.push(p.id); PHASE_BY_ID[p.id] = p; }));
+
+/* ============================ ILUSTRAÇÕES ============================ */
+const AV_COLORS = ["#FFD23F", "#FF5C8A", "#2EE6A6", "#3EC5FF", "#FF8A3D", "#C9B8FF"];
+const G = inner => '<g fill="none" stroke="#1B1464" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">' + inner + '</g>';
+const ICONS = {
+  chat:'<path d="M8 9h32a4 4 0 0 1 4 4v15a4 4 0 0 1-4 4H23l-10 9v-9H8a4 4 0 0 1-4-4V13a4 4 0 0 1 4-4z" fill="#fff"/><path d="M15 20.5h.1M24 20.5h.1M33 20.5h.1" stroke-width="4.5"/>',
+  monitor:'<rect x="5" y="7" width="38" height="26" rx="4" fill="#fff"/><path d="M12 15h10M12 21h17M12 27h7" stroke="#5B2EFF"/><path d="M24 33v7M15 41h18"/>',
+  cursor:'<path d="M13 6v32l9-8 6 12 5-2.5-6-12h12z" fill="#fff"/>',
+  folder:'<path d="M5 14a3 3 0 0 1 3-3h10l4 5h18a3 3 0 0 1 3 3v18a3 3 0 0 1-3 3H8a3 3 0 0 1-3-3z" fill="#fff"/><path d="M5 21h38"/>',
+  trophy:'<path d="M15 8h18v9a9 9 0 0 1-18 0z" fill="#FFD23F"/><path d="M15 11H8v2a7 7 0 0 0 7 7M33 11h7v2a7 7 0 0 1-7 7M24 26v8"/><path d="M19 34h10v6H19z" fill="#fff"/><path d="M14 41h20"/>',
+  warning:'<path d="M24 7 43 40H5z" fill="#fff"/><path d="M24 19v10M24 34.5h.1" stroke-width="4"/>',
+  lock:'<rect x="10" y="21" width="28" height="21" rx="4" fill="#fff"/><path d="M16 21v-6a8 8 0 0 1 16 0v6"/><path d="M24 30v4" stroke-width="4"/>',
+  magnifier:'<circle cx="21" cy="21" r="12" fill="#fff"/><path d="M30 30l11 11" stroke-width="5"/><path d="M15 21a6 6 0 0 1 6-6" stroke="#5B2EFF"/>',
+  bulb:'<path d="M24 5a13 13 0 0 0-7 24v5h14v-5a13 13 0 0 0-7-24z" fill="#fff"/><path d="M19 40h10M21 44h6"/>',
+  bug:'<path d="M14 24H6M14 31H5M15 37l-7 5M34 24h8M34 31h9M33 37l7 5M21 8l-4-4M27 8l4-4"/><ellipse cx="24" cy="28" rx="10" ry="13" fill="#fff"/><circle cx="24" cy="12" r="5" fill="#1B1464"/><path d="M24 17v24"/>',
+  star:'<path d="M24 4l6 14 15 1-12 10 4 15-13-8-13 8 4-15L3 19l15-1z" fill="#FFD23F"/>',
+  cards:'<rect x="7" y="13" width="22" height="29" rx="4" fill="#fff" transform="rotate(-10 18 27)"/><rect x="19" y="8" width="22" height="29" rx="4" fill="#3EC5FF" transform="rotate(8 30 22)"/>',
+  key:'<circle cx="15" cy="24" r="8" fill="#FFD23F"/><path d="M23 24h20M36 24v7M42 24v5"/>',
+  chart:'<rect x="7" y="26" width="8" height="15" rx="2" fill="#FF5C8A"/><rect x="20" y="16" width="8" height="25" rx="2" fill="#3EC5FF"/><rect x="33" y="7" width="8" height="34" rx="2" fill="#2EE6A6"/>',
+  flame:'<path d="M24 4c5 9 13 13 13 25a13 13 0 0 1-26 0c0-7 5-9 7-16 3 3 5 2 6-9z" fill="#FF8A3D"/>',
+  bolt:'<path d="M27 4 9 27h12l-3 17 19-24H25z" fill="#FFD23F"/>'
+};
+function svgEl(vb, inner, cls, label){
+  const s = document.createElement("span");
+  s.className = "svg" + (cls ? " " + cls : "");
+  s.innerHTML = '<svg viewBox="' + vb + '" xmlns="http://www.w3.org/2000/svg" ' + (label ? 'role="img" aria-label="' + label + '"' : 'aria-hidden="true"') + '>' + inner + '</svg>';
+  return s;
+}
+function icon(name, cls){ return svgEl("0 0 48 48", G(ICONS[name]), cls); }
+/* Bit, o robô mascote. mood: happy, neutral ou sad */
+function bit(color, mood, cls){
+  const c = mood === "sad" ? "#FF5C8A" : "#2EE6A6";
+  const eyes = mood === "happy" ? '<path d="M39 53q7-11 14 0M67 53q7-11 14 0"/>'
+    : mood === "sad" ? '<path d="M39 43l12 5M81 43l-12 5"/><path d="M45 55h.1M75 55h.1" stroke-width="9"/>'
+    : '<path d="M46 51h.1M74 51h.1" stroke-width="12"/>';
+  const mouth = mood === "happy" ? '<path d="M50 63q10 9 20 0"/>' : mood === "sad" ? '<path d="M51 69q9-7 18 0"/>' : '<path d="M52 66h16"/>';
+  return svgEl("0 0 120 96",
+    '<g stroke="#1B1464" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M60 18v-6"/><circle cx="60" cy="9" r="5" fill="#FF5C8A"/>' +
+    '<rect x="5" y="38" width="13" height="26" rx="5" fill="' + color + '"/><rect x="102" y="38" width="13" height="26" rx="5" fill="' + color + '"/>' +
+    '<rect x="16" y="18" width="88" height="72" rx="20" fill="' + color + '"/><rect x="27" y="30" width="66" height="48" rx="12" fill="#1B1464"/></g>' +
+    '<g fill="none" stroke="' + c + '" stroke-width="5" stroke-linecap="round">' + eyes + mouth + '</g>', cls || "bit");
+}
+function maya(){
+  return svgEl("0 0 60 60",
+    '<g stroke="#1B1464" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"><circle cx="30" cy="30" r="28" fill="#FFD23F"/>' +
+    '<path d="M13 46c-4-20 2-34 17-34s21 14 17 34z" fill="#3B1F6B"/><circle cx="30" cy="31" r="12.5" fill="#F3B98C"/>' +
+    '<path d="M18 28c4-9 20-10 24 0-8-4-16-4-24 0z" fill="#3B1F6B"/>' +
+    '<path d="M25 31h.1M35 31h.1" stroke-width="3.5"/><path d="M25.5 36.5q4.500 3.500 9 0" fill="none"/>' +
+    '<path d="M15 31a15 15 0 0 1 30 0" fill="none" stroke="#FF5C8A" stroke-width="3.5"/><rect x="11.500" y="28" width="6" height="10" rx="2.500" fill="#FF5C8A"/><rect x="42.500" y="28" width="6" height="10" rx="2.500" fill="#FF5C8A"/></g>', null, "Maya");
+}
+function banner(n){
+  const open = '<g stroke="#1B1464" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" fill="none">';
+  if (n === 1) return svgEl("0 0 300 120", open +
+    '<path d="M40 70h28l-4 26H44z" fill="#FF8A3D"/><path d="M54 70c-2-18-16-22-22-20 2 10 10 18 22 20zM54 70c2-22 18-26 24-24-2 12-10 20-24 24z" fill="#2EE6A6"/><path d="M54 70V54"/>' +
+    '<rect x="96" y="12" width="108" height="70" rx="8" fill="#fff"/><rect x="106" y="22" width="88" height="50" rx="3" fill="#1B1464"/>' +
+    '<path d="M116 33h24" stroke="#FF5C8A"/><path d="M116 43h46M124 53h30" stroke="#2EE6A6"/><path d="M116 63h18" stroke="#FFD23F"/>' +
+    '<path d="M142 82h16v14h-16z" fill="#fff"/><path d="M228 66h26v24a6 6 0 0 1-6 6h-14a6 6 0 0 1-6-6z" fill="#FFD23F"/><path d="M254 72h6a6 6 0 0 1 0 12h-6M236 58c-3-5 3-7 0-12M246 58c-3-5 3-7 0-12"/>' +
+    '<path d="M4 97h292" stroke-width="5"/></g>');
+  return svgEl("0 0 300 120", open +
+    '<path d="M36 40l26 46H10z" fill="#FFD23F"/><path d="M36 58v12M36 78h.1" stroke-width="4"/>' +
+    '<rect x="78" y="10" width="150" height="98" rx="10" fill="#14103A"/><path d="M78 30h150"/>' +
+    '<path d="M90 20h.1" stroke="#FF5C8A" stroke-width="6"/><path d="M101 20h.1" stroke="#FFD23F" stroke-width="6"/><path d="M112 20h.1" stroke="#2EE6A6" stroke-width="6"/>' +
+    '<path d="M92 46h62" stroke="#FF5C8A"/><path d="M92 60h104M92 74h42" stroke="#fff"/><path d="M92 90h76" stroke="#2EE6A6"/>' +
+    '<g transform="translate(262 62) rotate(18)"><path d="M-10-4h-9M-10 5h-10M-9 13l-8 5M10-4h9M10 5h10M9 13l8 5M-3-22l-4-5M3-22l4-5"/><ellipse cx="0" cy="4" rx="11" ry="15" fill="#fff"/><circle cx="0" cy="-15" r="6" fill="#1B1464"/><path d="M0-9V19"/></g></g>');
+}
+function stars(n, big){
+  const s = h("span", {class:"stars" + (big ? " big" : ""), role:"img", "aria-label":n + " de 3 estrelas"});
+  for (let i = 0; i < 3; i++) s.append(svgEl("0 0 48 48", G(i < n ? ICONS.star : ICONS.star.replace("#FFD23F", "#fff")), i < n ? "fill" : ""));
+  return s;
+}
+function confetti(){
+  if (isB() || (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches)) return;
+  const box = document.getElementById("confetti"), cols = ["#FFD23F", "#FF5C8A", "#2EE6A6", "#3EC5FF", "#FF8A3D", "#fff"];
+  for (let i = 0; i < 70; i++){
+    const c = document.createElement("i");
+    c.style.left = Math.random() * 100 + "%"; c.style.background = cols[i % cols.length];
+    c.style.animationDelay = Math.random() * 0.7 + "s"; c.style.animationDuration = 1.4 + Math.random() + "s";
+    c.style.borderRadius = i % 3 === 0 ? "50%" : "3px";
+    box.append(c);
+  }
+  setTimeout(() => box.replaceChildren(), 3400);
+}
+
+/* ============================ UTILIDADES ============================ */
+const FORMA = (new URLSearchParams(location.search).get("forma") === "2" || CONFIG.FORMA_TESTE === 2) ? 2 : 1;
+const LABELS = {
+  mc:["Choose the best option.", "Escolha a melhor opção."],
+  match:["Match the pairs.", "Clique em um item da esquerda e depois no par dele à direita."],
+  type:["Type your answer.", "Digite a resposta."],
+  order:["Put the words in order.", "Clique nas palavras na ordem certa."],
+  spot:["Find the wrong word.", "Encontre a palavra errada."]
+};
+function h(tag, props, ...kids){
+  const e = document.createElement(tag);
+  if (props) for (const k in props){
+    const v = props[k];
+    if (k === "class") e.className = v;
+    else if (k.startsWith("on")) e.addEventListener(k.slice(2), v);
+    else if (v === true) e.setAttribute(k, "");
+    else if (v !== false && v != null) e.setAttribute(k, v);
+  }
+  for (const c of kids.flat()){
+    if (c == null || c === false) continue;
+    e.append(c.nodeType ? c : document.createTextNode(String(c)));
+  }
+  return e;
+}
+function shuffle(a){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+function norm(s){ return String(s).trim().toLowerCase().replace(/\s+/g, " ").replace(/[.!?]+$/, ""); }
+const mem = {};
+const LS = {
+  get(k, d){ if (k in mem) return mem[k]; try { const v = localStorage.getItem(k); mem[k] = v ? JSON.parse(v) : d; } catch (e) { mem[k] = d; } return mem[k]; },
+  set(k, v){ mem[k] = v; try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+function isB(){ return document.body.classList.contains("modoB"); }
+function starsOf(pct){ return pct >= STAR_MIN[0] ? 3 : pct >= STAR_MIN[1] ? 2 : pct >= STAR_MIN[2] ? 1 : 0; }
+function minToPass(n){ return Math.ceil(STAR_MIN[2] * n - 1e-9); }
+function turmaLabel(t){ return t + "º ano"; }
+function today(){ const d = new Date(); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+function fmtTime(s){ return Math.floor(s / 60) + ":" + String(s % 60).padStart(2, "0"); }
+
+/* ============================== ESTADO ============================== */
+let profiles = LS.get("deq_profiles", {});
+let P = null;
+function save(){ if (!P) return; profiles[P.key] = P; LS.set("deq_profiles", profiles); }
+function newProfile(name, turma, key, av){ return {key, name, turma, av, modoB:false, test:null, stars:{}, best:{}, tries:{}, xp:0, deck:{}, days:[], secs:0, okSum:0, totSum:0, flags:{}}; }
+function fixProfile(p){ ["stars", "best", "tries", "deck", "flags"].forEach(k => { if (!p[k]) p[k] = {}; }); if (!p.days) p.days = []; ["xp", "secs", "okSum", "totSum", "av"].forEach(k => { if (!p[k]) p[k] = 0; }); return p; }
+function setModoB(v){ if (P){ P.modoB = v; save(); } document.body.classList.toggle("modoB", !!v); }
+function passed(id){ return (P.stars[id] || 0) >= 1; }
+function passedCount(){ return PHASE_IDS.filter(passed).length; }
+function starTotal(){ return PHASE_IDS.reduce((s, id) => s + (P.stars[id] || 0), 0); }
+function role(){ return passed("2.B") ? "Junior Developer" : passed("1.B") ? "Trainee" : "Intern"; }
+/* Todos começam do zero: cada fase abre quando a anterior é concluída. */
+function phaseOpen(idx){ return !!P.test && (idx === 0 || passed(PHASE_IDS[idx - 1])); }
+function addCard(c){
+  if (!c) return 0;
+  const k = c[0].toLowerCase();
+  if (Object.keys(P.deck).some(x => x.toLowerCase() === k)) return 0;
+  P.deck[c[0]] = {pt:c[1], box:0}; return 1;
+}
+const BADGES = [
+  {ic:"chat", nome:"Primeiro dia", como:"Conclua a fase Welcome aboard", ok:() => passed("1.1")},
+  {ic:"trophy", nome:"Onboarding completo", como:"Vença o desafio do Mundo 1", ok:() => passed("1.B")},
+  {ic:"bug", nome:"Caça-bugs", como:"Vença o desafio do Mundo 2", ok:() => passed("2.B")},
+  {ic:"star", nome:"Três estrelas", como:"Ganhe 3 estrelas em uma fase", ok:() => PHASE_IDS.some(id => P.stars[id] === 3)},
+  {ic:"bolt", nome:"Combo x5", como:"Acerte 5 seguidas em uma fase", ok:() => !!P.flags.combo5},
+  {ic:"cards", nome:"Baralho zerado", como:"Esvazie o baralho de revisão", ok:() => !!P.flags.deckClear},
+  {ic:"flame", nome:"5 dias de treino", como:"Jogue em 5 dias diferentes", ok:() => P.days.length >= 5}
+];
+
+/* ======================== CÓDIGO DE PROGRESSO ======================== */
+const ALPHA = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
+function codeFields(){
+  const f = [["v",4],["turma",1],["modoB",1],["done",1],["band",2],["forma",1],["av",3],["xp",12]];
+  PHASE_IDS.forEach(id => f.push(["s" + id, 2]));
+  return f;
+}
+function packCode(){
+  const vals = {v:2, turma:Number(P.turma) - 1, modoB:P.modoB ? 1 : 0, done:P.test ? 1 : 0, band:P.test ? P.test.band : 0,
+    forma:P.test ? P.test.forma - 1 : 0, av:P.av || 0, xp:Math.min(4095, Math.round(P.xp / 10))};
+  PHASE_IDS.forEach(id => { vals["s" + id] = P.stars[id] || 0; });
+  let n = 0n;
+  for (const [k, b] of codeFields()) n = (n << BigInt(b)) | BigInt(vals[k]);
+  let s = "";
+  for (let i = 0; i < 9; i++){ s = ALPHA[Number(n & 31n)] + s; n >>= 5n; }
+  let ck = 0;
+  for (let i = 0; i < 9; i++) ck = (ck + (i + 1) * ALPHA.indexOf(s[i])) % 32;
+  s += ALPHA[ck];
+  return s.slice(0, 5) + "-" + s.slice(5);
+}
+function decodeCode(txt){
+  const s = String(txt).toUpperCase().replace(/[^A-Z0-9]/g, "");
+  if (s.length !== 10) return null;
+  let ck = 0, n = 0n;
+  for (let i = 0; i < 9; i++){ const d = ALPHA.indexOf(s[i]); if (d < 0) return null; ck = (ck + (i + 1) * d) % 32; n = (n << 5n) | BigInt(d); }
+  if (ALPHA[ck] !== s[9]) return null;
+  const out = {}; const f = codeFields();
+  for (let i = f.length - 1; i >= 0; i--){ const b = BigInt(f[i][1]); out[f[i][0]] = Number(n & ((1n << b) - 1n)); n >>= b; }
+  if (out.v !== 2 || out.av > 5) return null;
+  out.turma += 1; out.forma += 1;
+  return out;
+}
+function applyRestore(p, r){
+  p.modoB = !!r.modoB; p.av = r.av; p.xp = Math.max(p.xp, r.xp * 10);
+  PHASE_IDS.forEach(id => {
+    const st = r["s" + id]; if (!st) return;
+    p.stars[id] = Math.max(p.stars[id] || 0, st);
+    p.best[id] = Math.max(p.best[id] || 0, Math.ceil(STAR_MIN[3 - st] * PHASE_BY_ID[id].items.length - 1e-9));
+  });
+  if (r.done && !p.test) p.test = {band:r.band, forma:r.forma, faixa:BANDS[r.band].nome, restored:true};
+}
+
+/* ========================= ENVIO PARA A PLANILHA ========================= */
+function endpointOk(){ return /^https:\/\//.test(CONFIG.ENDPOINT_URL); }
+async function post(payload){
+  if (!endpointOk()) return "noconfig";
+  const body = JSON.stringify(payload);
+  const headers = {"Content-Type":"text/plain;charset=utf-8"};
+  const ctl = new AbortController(); const timer = setTimeout(() => ctl.abort(), 15000);
+  try {
+    const r = await fetch(CONFIG.ENDPOINT_URL, {method:"POST", headers, body, signal:ctl.signal});
+    const j = await r.json();
+    return j && j.ok ? "ok" : "fail";
+  } catch (e) {
+    try { await fetch(CONFIG.ENDPOINT_URL, {method:"POST", mode:"no-cors", headers, body}); return "sent"; }
+    catch (e2) { return "fail"; }
+  } finally { clearTimeout(timer); }
+}
+async function deliver(payload){
+  const st = await post(payload);
+  if (st === "fail"){ const q = LS.get("deq_queue", []); if (!q.some(x => x.id === payload.id)){ q.push(payload); LS.set("deq_queue", q); } }
+  return st;
+}
+let flushing = false;
+async function flushQueue(){
+  if (flushing || !endpointOk()) return;
+  const q = LS.get("deq_queue", []); if (!q.length) return;
+  flushing = true; const rest = [];
+  for (const p of q){ const st = await post(p); if (st === "fail") rest.push(p); }
+  LS.set("deq_queue", rest); flushing = false;
+}
+window.addEventListener("online", flushQueue);
+function newId(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 8); }
+function nowLocal(){ return new Date().toLocaleString("pt-BR"); }
+
+/* ============================== TELAS ============================== */
+const app = document.getElementById("app");
+let onKey = null, clockTimer = null;
+document.addEventListener("keydown", e => { if (onKey) onKey(e); });
+function show(...nodes){
+  onKey = null; if (clockTimer){ clearInterval(clockTimer); clockTimer = null; }
+  app.replaceChildren(...nodes.flat().filter(Boolean)); window.scrollTo(0, 0);
+}
+function card(cls, ...kids){ return h("section", {class:"card" + (cls ? " " + cls : "")}, ...kids); }
+function hud(){
+  const lvl = Math.floor(P.xp / 100) + 1, d = P.days.length;
+  return h("header", {class:"hud"}, bit(AV_COLORS[P.av || 0], "happy", "me"),
+    h("div", {class:"id"}, h("b", null, P.name),
+      h("div", {class:"chips"}, h("span", {class:"chip sky"}, turmaLabel(P.turma)), h("span", {class:"chip pink"}, role()),
+        h("span", {class:"chip sun"}, icon("star"), starTotal() + " de " + PHASE_IDS.length * 3),
+        h("span", {class:"chip"}, icon("flame"), d + (d === 1 ? " dia de treino" : " dias de treino")))),
+    h("div", {class:"xp"}, h("div", null, h("b", null, "Nível " + lvl), h("span", {class:"muted"}, "  " + P.xp + " XP")),
+      h("div", {class:"xpbar", role:"img", "aria-label":"Progresso para o próximo nível: " + (P.xp % 100) + "%"}, h("i", {style:"width:" + (P.xp % 100) + "%"}))));
+}
+
+function screenLogin(){
+  P = null; document.body.classList.remove("modoB");
+  let av = Math.floor(Math.random() * AV_COLORS.length);
+  const nome = h("input", {type:"text", id:"nome", autocomplete:"off", maxlength:"80"});
+  const turma = h("select", {id:"turma"}, h("option", {value:""}, "Selecione"), h("option", {value:"1"}, "1º ano"), h("option", {value:"2"}, "2º ano"));
+  const modo = h("input", {type:"checkbox", id:"modo"});
+  const code = h("input", {type:"text", id:"code", maxlength:"14", placeholder:"XXXXX-XXXXX", autocomplete:"off"});
+  const err = h("p", {class:"errmsg", role:"alert"});
+  const avBtns = AV_COLORS.map((c, i) => h("button", {class:"av", type:"button", "aria-pressed":i === av ? "true" : "false", "aria-label":"Robô " + (i + 1),
+    onclick:() => { av = i; avBtns.forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false")); }}, bit(c, "happy")));
+  function enter(p){ P = fixProfile(p); save(); setModoB(P.modoB); flushQueue(); screenHome(); }
+  function go(){
+    const n = nome.value.trim().replace(/\s+/g, " ");
+    if (n.split(" ").length < 2){ err.textContent = "Digite seu nome completo (nome e sobrenome)."; nome.focus(); return; }
+    let t = turma.value, restored = null;
+    if (code.value.trim()){
+      restored = decodeCode(code.value);
+      if (!restored){ err.textContent = "Código de progresso inválido. Confira as letras e os números."; code.focus(); return; }
+      t = String(restored.turma);
+    }
+    if (!t){ err.textContent = "Selecione a sua turma."; turma.focus(); return; }
+    const key = n.toLowerCase() + "|" + t;
+    const p = profiles[key] || newProfile(n, t, key, av);
+    if (restored) applyRestore(fixProfile(p), restored);
+    if (modo.checked) p.modoB = true;
+    enter(p);
+  }
+  const saved = Object.values(profiles);
+  show(
+    h("div", {class:"hero"}, bit("#FFD23F", "happy"), h("div", null, h("h1", null, "Dev English Quest"),
+      h("p", null, "Você acaba de ser contratado pela NovaByte. Suba de cargo treinando o inglês que todo dev usa no trabalho."))),
+    saved.length ? card("lilac", h("h3", null, "Continuar neste computador"),
+      h("div", {class:"saved"}, saved.map(p => h("button", {class:"btn", type:"button", onclick:() => enter(p)}, bit(AV_COLORS[p.av || 0], "happy"), p.name + " (" + turmaLabel(p.turma) + ")")))) : null,
+    card("", h("h2", null, "Novo jogador"),
+      h("label", {for:"nome"}, "Nome completo"), nome,
+      h("label", {for:"turma"}, "Turma"), turma,
+      h("label", null, "Escolha o seu robô"), h("div", {class:"avs"}, avBtns),
+      h("label", {class:"check"}, modo, h("span", null, h("b", null, "Modo B"), ": letras maiores, sem cronômetro, sem animações, instruções em destaque e dicas. O conteúdo é o mesmo.")),
+      h("label", {for:"code"}, "Código de progresso (só se você já jogou em outro computador)"), code,
+      err,
+      h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:go}, "Entrar no jogo")),
+      h("p", {class:"muted", style:"margin-top:14px"}, "Seu nome e seus resultados são enviados apenas para a professora."))
+  );
+  nome.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+  code.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+}
+
+function screenHome(){
+  const deckN = Object.keys(P.deck).length;
+  const nextIdx = PHASE_IDS.findIndex((id, i) => phaseOpen(i) && !passed(id));
+  const nodes = [hud()];
+  nodes.push(h("div", {class:"actions"},
+    h("button", {class:"btn" + (deckN ? " primary" : ""), type:"button", onclick:screenDeck}, icon("cards"), "Baralho de revisão (" + deckN + ")"),
+    h("button", {class:"btn", type:"button", onclick:screenProgress}, icon("chart"), "Meu progresso"),
+    h("button", {class:"btn", type:"button", onclick:screenCode}, icon("key"), "Código de progresso"),
+    h("button", {class:"btn" + (P.modoB ? " on" : ""), type:"button", "aria-pressed":P.modoB ? "true" : "false", onclick:() => { setModoB(!P.modoB); screenHome(); }}, "Modo B: " + (P.modoB ? "ligado" : "desligado")),
+    h("button", {class:"btn", type:"button", onclick:screenLogin}, "Sair")));
+  if (!P.test){
+    nodes.push(card("sun", h("h2", null, "Antes de começar: teste de nível"),
+      h("p", null, "São 24 questões rápidas. O teste não vale nota e não muda o seu ponto de partida: todo mundo começa junto, na fase 1."),
+      h("div", {class:"actions"}, h("button", {class:"btn", type:"button", onclick:screenTestIntro}, "Fazer o teste de nível"))));
+  } else if (P.test.forma !== FORMA){
+    nodes.push(card("sun", h("h2", null, "Novo teste de nível disponível"),
+      h("p", null, "Faça o teste de novo para ver o quanto você evoluiu."),
+      h("div", {class:"actions"}, h("button", {class:"btn", type:"button", onclick:screenTestIntro}, "Fazer o novo teste"))));
+  }
+  let idx = 0;
+  WORLDS.forEach(W => {
+    const first = idx, open = phaseOpen(first);
+    const trail = h("div", {class:"trail"}, W.phases.map(ph => {
+      const i = idx++, ok = phaseOpen(i), st = P.stars[ph.id] || 0;
+      return h("button", {class:"node" + (ph.boss ? " boss" : "") + (i === nextIdx ? " next" : ""), type:"button", disabled:!ok, onclick:() => playPhase(i)},
+        h("span", {class:"disc"}, icon(ok ? ph.ic : "lock")), h("b", null, ph.name), ok ? stars(st) : h("span", {class:"muted"}, "Bloqueada"));
+    }));
+    nodes.push(h("section", {class:"card world w" + W.id + (open ? "" : " locked")},
+      h("div", {class:"banner"}, banner(W.id), h("div", null, h("h3", null, "Mundo " + W.id + ": " + W.name), h("p", null, W.desc),
+        h("p", null, h("span", {class:"chip"}, "Cargo: " + W.role)),
+        open ? null : h("p", null, h("b", null, P.test ? "Vença o desafio do mundo anterior para liberar." : "Faça o teste de nível para liberar.")))),
+      trail));
+  });
+  nodes.push(card("lilac", h("h3", null, "Em breve"), h("div", {class:"soon"}, COMING.map(c => h("span", {class:"chip"}, icon("lock"), c)))));
+  show(nodes);
+}
+
+/* --------------------------- motor das questões --------------------------- */
+function autoHint(it){
+  if (it.t === "type") return "Começa com \"" + it.ans[0][0].toUpperCase() + "\" e tem " + it.ans[0].length + " letras.";
+  if (it.t === "order") return "A primeira palavra é \"" + it.w[0] + "\".";
+  return null;
+}
+function ctxEl(it){
+  if (it.k === "code") return h("div", {class:"term"}, h("div", {class:"dots"}, h("i"), h("i"), h("i")), h("pre", null, it.ctx));
+  if (it.ctx.startsWith("Maya: ")) return h("div", {class:"chat"}, maya(), h("div", {class:"bubble"}, h("b", null, "Maya"), it.ctx.slice(6)));
+  return h("div", {class:"note"}, it.ctx);
+}
+function renderItem(box, it, mode, done){
+  const type = it.t || "mc", game = mode === "game";
+  let locked = false;
+  box.replaceChildren();
+  const lab = LABELS[type];
+  box.append(h("p", {class:"instr"}, h("span", {class:"en"}, lab[0]), h("span", {class:"pt"}, lab[1])));
+  if (it.ctx) box.append(ctxEl(it));
+  if (it.q) box.append(h("p", {class:"q"}, it.q));
+  const hint = game ? (it.h || autoHint(it)) : null;
+  if (hint && isB()){
+    const hp = h("p", {class:"hint", hidden:true}, "Dica: " + hint);
+    box.append(h("div", {class:"tools"}, h("button", {class:"btn", type:"button", onclick:() => { hp.hidden = false; }}, icon("bulb"), "Dica")), hp);
+  }
+  const area = h("div"); box.append(area);
+  const conf = h("button", {class:"btn primary", type:"button", disabled:true}, game ? "Confirmar" : "Próxima");
+  const actions = h("div", {class:"actions"}, conf);
+  function finish(ok, ans, cards){
+    locked = true; onKey = null; conf.disabled = true;
+    if (!game){ done(ok, []); return; }
+    const words = (cards || []).map(c => c[0]); let added = 0;
+    if (!ok && it.c){ words.push(it.c[0]); added += addCard(it.c); }
+    (cards || []).forEach(c => { added += addCard(c); });
+    if (added) save();
+    if (!ok) area.classList.add("shake");
+    const go = h("button", {class:"btn primary", type:"button", onclick:() => done(ok, words)}, "Continuar");
+    const fb = h("div", {class:"fb " + (ok ? "ok" : "err"), role:"status"}, bit(AV_COLORS[P.av || 0], ok ? "happy" : "sad"),
+      h("div", null, h("strong", null, ok ? "Correto!" : "Ainda não."),
+        !ok && ans ? h("p", null, "Resposta: ", h("b", null, ans)) : null,
+        it.e ? h("p", null, it.e) : null,
+        added ? h("p", {class:"muted"}, added === 1 ? "1 carta nova no baralho de revisão." : added + " cartas novas no baralho de revisão.") : null,
+        h("div", {class:"actions"}, go)));
+    box.append(fb); go.focus(); fb.scrollIntoView({block:"nearest"});
+  }
+
+  if (type === "mc"){
+    const opts = shuffle(it.o.map((t, i) => ({t, ok:i === 0})));
+    let sel = -1;
+    const btns = opts.map((o, i) => h("button", {class:"opt", type:"button", onclick:() => pick(i)}, h("span", {class:"key"}, i + 1), h("span", null, o.t)));
+    function pick(i){ if (locked) return; sel = i; btns.forEach((b, j) => b.classList.toggle("sel", j === i)); conf.disabled = false; conf.focus(); }
+    conf.addEventListener("click", () => {
+      if (sel < 0 || locked) return;
+      const ok = opts[sel].ok;
+      if (game) btns.forEach((b, j) => { b.disabled = true; b.classList.remove("sel"); if (opts[j].ok) b.classList.add("right"); else if (j === sel) b.classList.add("wrong"); });
+      finish(ok, it.o[0]);
+    });
+    area.append(h("div", {class:"opts" + (it.o.every(t => t.length <= 26) ? " two" : "")}, btns)); box.append(actions);
+    onKey = e => { if (locked || e.target.tagName === "INPUT") return; const n = parseInt(e.key, 10); if (n >= 1 && n <= opts.length) pick(n - 1); };
+  }
+  else if (type === "type"){
+    const inp = h("input", {type:"text", autocomplete:"off", autocapitalize:"off", spellcheck:"false", "aria-label":"Sua resposta"});
+    inp.addEventListener("input", () => { conf.disabled = !inp.value.trim(); });
+    function check(){ if (locked || !inp.value.trim()) return; inp.disabled = true; finish(it.ans.some(a => norm(a) === norm(inp.value)), it.ans[0]); }
+    inp.addEventListener("keydown", e => { if (e.key === "Enter"){ e.preventDefault(); check(); } });
+    conf.addEventListener("click", check);
+    area.append(inp); box.append(actions); setTimeout(() => inp.focus(), 0);
+  }
+  else if (type === "order"){
+    const answer = it.w.join(" ");
+    let bank = shuffle(it.w.map((t, i) => ({t, i})));
+    if (it.w.length > 1) while (bank.map(x => x.t).join(" ") === answer) bank = shuffle(bank);
+    const line = [];
+    const lineEl = h("div", {class:"tokens line", "aria-label":"Sua frase"}), bankEl = h("div", {class:"tokens", "aria-label":"Palavras disponíveis"});
+    function draw(){
+      lineEl.replaceChildren(...line.map((x, k) => h("button", {class:"tok sel", type:"button", disabled:locked, onclick:() => { if (locked) return; bank.push(line.splice(k, 1)[0]); draw(); }}, x.t)));
+      bankEl.replaceChildren(...bank.map((x, k) => h("button", {class:"tok", type:"button", onclick:() => { if (locked) return; line.push(bank.splice(k, 1)[0]); draw(); }}, x.t)));
+      conf.disabled = bank.length > 0;
+      if (!locked){ const f = bankEl.querySelector("button"); if (f) f.focus(); else conf.focus(); }
+    }
+    conf.addEventListener("click", () => { if (locked || bank.length) return; const ok = line.map(x => x.t).join(" ") === answer; locked = true; draw(); finish(ok, answer); });
+    area.append(lineEl, bankEl); box.append(actions); draw();
+  }
+  else if (type === "spot"){
+    let sel = -1;
+    const btns = it.w.map((t, i) => h("button", {class:"tok", type:"button", onclick:() => { if (locked) return; sel = i; btns.forEach((b, j) => b.classList.toggle("sel", j === i)); conf.disabled = false; }}, t));
+    conf.addEventListener("click", () => {
+      if (sel < 0 || locked) return;
+      btns.forEach((b, j) => { b.disabled = true; b.classList.remove("sel"); if (j === it.a) b.classList.add("right"); else if (j === sel) b.classList.add("wrong"); });
+      finish(sel === it.a, it.w[it.a].replace(/[.:]$/, ""));
+    });
+    area.append(h("div", {class:"tokens line"}, btns)); box.append(actions);
+  }
+  else if (type === "match"){
+    const L = shuffle(it.pairs.map((p, i) => ({t:p[0], i}))), R = shuffle(it.pairs.map((p, i) => ({t:p[1], i})));
+    let selL = null, left = it.pairs.length, miss = 0; const missed = {};
+    const lb = L.map(x => h("button", {class:"tok", type:"button", onclick:() => { selL = x; lb.forEach((b, j) => b.classList.toggle("sel", L[j] === x)); }}, x.t));
+    const rb = R.map(x => h("button", {class:"tok", type:"button", onclick:() => {
+      if (!selL) return;
+      const bl = lb[L.indexOf(selL)], br = rb[R.indexOf(x)];
+      if (selL.i === x.i){
+        bl.classList.remove("sel"); br.classList.remove("wrong"); bl.classList.add("right"); br.classList.add("right"); bl.disabled = br.disabled = true; selL = null; left--;
+        if (!left) finish(miss <= 1, null, Object.keys(missed).map(i => it.pairs[i]));
+      } else {
+        miss++; missed[selL.i] = 1; br.classList.add("wrong"); setTimeout(() => br.classList.remove("wrong"), 500);
+      }
+    }}, x.t));
+    area.append(h("div", {class:"cols"}, h("div", {class:"opts"}, lb), h("div", {class:"opts"}, rb)));
+  }
+}
+
+/* ------------------------------ teste de nível ------------------------------ */
+function screenTestIntro(){
+  show(hud(), card("", h("div", {class:"chat"}, maya(), h("div", {class:"bubble"}, h("b", null, "Maya"), "Before your first day, I need to know your English. Relax: this is not a grade!")),
+    h("h2", null, "Teste de nível"),
+    h("p", null, "São 24 questões. Leva cerca de 15 minutos."),
+    h("p", null, "Responda sem ajuda e sem tradutor. Se não souber, escolha a opção que parecer melhor e siga em frente."),
+    h("p", null, "O teste não vale nota e não muda o seu ponto de partida. Ele mostra para a professora como a turma está hoje."),
+    h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:runTest}, "Começar o teste"), h("button", {class:"btn", type:"button", onclick:screenHome}, "Voltar"))));
+}
+function runTest(){
+  const items = TESTS[FORMA], res = [], t0 = Date.now(); let i = 0, usedB = isB();
+  const count = h("span", null), bar = h("i"), box = h("div");
+  show(h("div", {class:"phasehead"}, count, h("div", {class:"xpbar"}, bar)), card("", box));
+  (function next(){
+    if (i >= items.length) return finishTest(items, res, Date.now() - t0, usedB);
+    count.textContent = "Questão " + (i + 1) + " de " + items.length;
+    bar.style.width = (i / items.length * 100) + "%";
+    renderItem(box, items[i], "test", ok => { res.push(ok); if (isB()) usedB = true; i++; next(); });
+  })();
+}
+function finishTest(items, res, ms, usedB){
+  const sk = {}, bl = {1:[0,0], 2:[0,0], 3:[0,0]};
+  Object.keys(SK).forEach(k => { sk[k] = [0, 0]; });
+  items.forEach((it, i) => { sk[it.s][1]++; bl[it.b][1]++; if (res[i]){ sk[it.s][0]++; bl[it.b][0]++; } });
+  const total = res.filter(Boolean).length, max = items.length, pct = Math.round(total / max * 100);
+  let band = 0; BANDS.forEach(b => { if (pct >= b.min) band = b.id; });
+  /* A faixa também depende do bloco correspondente, para não superestimar quem acertou só as questões fáceis. */
+  const ratio = a => a[1] ? a[0] / a[1] : 0;
+  if (band >= 3 && ratio(bl[3]) < 0.75) band = 2;
+  if (band >= 2 && ratio(bl[3]) < 0.5) band = 1;
+  if (band >= 1 && ratio(bl[2]) < 0.5) band = 0;
+  const fr = a => a[0] + " de " + a[1];
+  const weak = Object.keys(SK).filter(k => sk[k][0] / sk[k][1] < 0.5).map(k => SK[k]);
+  const rep = {tipo:"teste", id:newId(), ts:Date.now(), dataLocal:nowLocal(), nome:P.name, turma:turmaLabel(P.turma), forma:"Forma " + FORMA,
+    modoB:usedB ? "Sim" : "Não", faixa:BANDS[band].nome, total, max, pct,
+    vg:fr(sk.VG), vt:fr(sk.VT), g:fr(sk.G), r:fr(sk.R), b1:fr(bl[1]), b2:fr(bl[2]), b3:fr(bl[3]),
+    tempoMin:Math.max(1, Math.round(ms / 60000)), reforcar:weak.length ? weak.join("; ") : "Nenhum abaixo de 50%"};
+  P.test = {band, forma:FORMA, faixa:rep.faixa, rep}; save();
+  screenReport(rep, deliver(rep));
+}
+function reportRows(r){
+  return [["Nome", r.nome], ["Turma", r.turma], ["Data", r.dataLocal], ["Forma do teste", r.forma], ["Modo B", r.modoB], ["Faixa", r.faixa],
+    ["Acertos", r.total + " de " + r.max + " (" + r.pct + "%)"], ["Vocabulário geral", r.vg], ["Vocabulário de TI", r.vt], ["Gramática", r.g],
+    ["Leitura", r.r], ["Bloco A1", r.b1], ["Bloco A2", r.b2], ["Bloco B1", r.b3], ["Tempo", r.tempoMin + " min"], ["Pontos a reforçar", r.reforcar]];
+}
+function reportText(r){ return "DEV ENGLISH QUEST - RELATÓRIO DO TESTE DE NÍVEL\n" + reportRows(r).map(x => x[0] + ": " + x[1]).join("\n") + "\nID: " + r.id + "\n"; }
+function screenReport(rep, sending){
+  const st = h("p", {class:"status", role:"status"}, sending ? "Enviando o relatório para a professora..." : "");
+  function setStatus(s){
+    st.className = "status " + (s === "ok" || s === "sent" ? "ok" : "warn");
+    st.textContent = s === "ok" ? "Relatório enviado para a professora."
+      : s === "sent" ? "Relatório enviado para a professora (sem confirmação do servidor). Na dúvida, use Copiar ou Baixar e poste no Classroom."
+      : s === "noconfig" ? "O envio automático não está configurado neste arquivo. Use Copiar ou Baixar e poste o relatório no Classroom."
+      : "Sem conexão agora. O relatório ficou guardado neste computador e será reenviado sozinho. Use também Copiar ou Baixar e poste no Classroom.";
+  }
+  if (sending) sending.then(setStatus); else st.hidden = true;
+  const msg = h("p", {class:"muted"});
+  const skills = [["Vocabulário geral", rep.vg], ["Vocabulário de TI", rep.vt], ["Gramática", rep.g], ["Leitura", rep.r]];
+  show(hud(), card("",
+    h("h2", null, "Seu resultado no teste"),
+    h("p", null, "Faixa de hoje: ", h("span", {class:"chip sun"}, rep.faixa), " Você acertou ", h("b", null, rep.total + " de " + rep.max), "."),
+    h("p", null, "Este é só o retrato de hoje. Todo mundo começa na fase 1 e sobe de nível jogando."),
+    h("div", {style:"margin:14px 0"}, skills.map(s => { const p = s[1].split(" de "); return h("div", {class:"skill"}, h("b", null, s[0]),
+      h("div", {class:"xpbar"}, h("i", {style:"width:" + (p[0] / p[1] * 100) + "%"})), h("span", null, s[1])); })),
+    st,
+    h("div", {class:"actions"},
+      h("button", {class:"btn primary", type:"button", onclick:screenHome}, "Ir para o jogo"),
+      h("button", {class:"btn", type:"button", onclick:async () => { msg.textContent = (await copyText(reportText(rep))) ? "Relatório copiado." : "Não foi possível copiar. Use Baixar."; }}, "Copiar relatório"),
+      h("button", {class:"btn", type:"button", onclick:() => downloadText("relatorio-" + rep.nome.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".txt", reportText(rep))}, "Baixar relatório"),
+      !sending ? h("button", {class:"btn", type:"button", onclick:() => { st.hidden = false; st.className = "status"; st.textContent = "Enviando o relatório para a professora..."; deliver(rep).then(setStatus); }}, "Enviar de novo") : null),
+    msg,
+    h("table", {class:"rep"}, h("tbody", null, reportRows(rep).map(x => h("tr", null, h("th", {scope:"row"}, x[0]), h("td", null, x[1])))))));
+}
+async function copyText(text){
+  try { await navigator.clipboard.writeText(text); return true; }
+  catch (e) { const ta = h("textarea"); ta.value = text; document.body.append(ta); ta.select(); let ok = false; try { ok = document.execCommand("copy"); } catch (e2) {} ta.remove(); return ok; }
+}
+function downloadText(name, text){
+  const url = URL.createObjectURL(new Blob([text], {type:"text/plain;charset=utf-8"}));
+  const a = h("a", {href:url, download:name}); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+}
+
+/* --------------------------------- fases --------------------------------- */
+function playPhase(idx){
+  const ph = PHASE_BY_ID[PHASE_IDS[idx]], W = WORLDS.find(w => w.phases.includes(ph)), items = ph.items;
+  let i = 0, ok = 0, t0 = 0, streak = 0, best = 0; const deck0 = Object.keys(P.deck).length, wrongWords = [];
+  show(hud(), card("", h("h2", null, "Mundo " + W.id + ": " + ph.name),
+    h("div", {class:"chat"}, maya(), h("div", {class:"bubble"}, h("b", null, "Maya"), ph.intro.en)),
+    h("p", null, ph.intro.pt),
+    h("p", {class:"muted"}, items.length + " atividades. Para passar, acerte pelo menos " + minToPass(items.length) + "."),
+    h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:start}, "Começar a fase"), h("button", {class:"btn", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
+  function start(){
+    const count = h("span", null), bar = h("i"), clock = h("span", {class:"clock"}, "0:00"), combo = h("span", {class:"chip combo", hidden:true}), box = h("div");
+    show(h("div", {class:"phasehead"}, count, h("div", {class:"xpbar"}, bar), combo, clock, h("button", {class:"btn", type:"button", onclick:screenHome}, "Sair da fase")), card("", box));
+    t0 = Date.now();
+    clockTimer = setInterval(() => { clock.textContent = fmtTime(Math.floor((Date.now() - t0) / 1000)); }, 1000);
+    (function next(){
+      if (i >= items.length) return end();
+      count.textContent = (i + 1) + " / " + items.length; bar.style.width = (i / items.length * 100) + "%";
+      renderItem(box, items[i], "game", (good, words) => {
+        if (good){ ok++; streak++; best = Math.max(best, streak); } else streak = 0;
+        words.forEach(w => { if (!wrongWords.includes(w)) wrongWords.push(w); });
+        combo.hidden = streak < 2; combo.replaceChildren(icon("flame"), "Combo x" + streak);
+        i++; next();
+      });
+    })();
+  }
+  function end(){
+    const n = items.length, st = starsOf(ok / n), secs = Math.round((Date.now() - t0) / 1000);
+    const prev = P.best[ph.id] || 0, gain = Math.max(0, ok - prev) * 10, wasPassed = passed(ph.id), badges0 = BADGES.filter(b => b.ok()).length;
+    P.xp += gain; P.best[ph.id] = Math.max(prev, ok); P.stars[ph.id] = Math.max(P.stars[ph.id] || 0, st);
+    P.tries[ph.id] = (P.tries[ph.id] || 0) + 1; P.secs += secs; P.okSum += ok; P.totSum += n;
+    if (best >= 5) P.flags.combo5 = 1;
+    if (!P.days.includes(today())) P.days.push(today());
+    save();
+    deliver({tipo:"fase", id:newId(), ts:Date.now(), dataLocal:nowLocal(), nome:P.name, turma:turmaLabel(P.turma), mundo:"Mundo " + W.id + " - " + W.name,
+      fase:ph.name, tentativa:P.tries[ph.id], acertos:ok, total:n, pct:Math.round(ok / n * 100), estrelas:st, passou:st ? "Sim" : "Não", tempoSeg:secs,
+      xp:P.xp, fasesConcluidas:passedCount(), erros:wrongWords.join("; "), modoB:isB() ? "Sim" : "Não",
+      faseId:ph.id, ordem:idx + 1, fasesTotal:PHASE_IDS.length});
+    const newCards = Object.keys(P.deck).length - deck0, newBadges = BADGES.filter(b => b.ok()).length - badges0;
+    const hasNext = idx + 1 < PHASE_IDS.length, promoted = ph.boss && st >= 1 && !wasPassed;
+    if (st) confetti();
+    show(hud(), card("center result", bit(AV_COLORS[P.av || 0], st ? "happy" : "sad"),
+      h("h2", null, st ? "Fase concluída!" : "Quase lá!"), stars(st, true),
+      h("div", {class:"tiles"}, h("div", {class:"tile"}, h("b", null, ok + " de " + n), "acertos"),
+        h("div", {class:"tile"}, h("b", null, "+" + gain), "XP"),
+        h("div", {class:"tile"}, h("b", null, "x" + best), "maior combo"),
+        h("div", {class:"tile clock"}, h("b", null, fmtTime(secs)), "tempo")),
+      promoted ? h("p", {class:"status ok"}, "Promoção! Seu novo cargo na NovaByte: " + role() + ".") : null,
+      newBadges > 0 ? h("p", {class:"status ok"}, newBadges === 1 ? "Você ganhou uma conquista nova. Veja em Meu progresso." : "Você ganhou " + newBadges + " conquistas novas. Veja em Meu progresso.") : null,
+      st ? null : h("p", null, "Para passar, acerte pelo menos " + minToPass(n) + ". Revise o baralho e tente de novo."),
+      newCards > 0 ? h("p", null, "As palavras que você errou foram para o baralho de revisão (" + newCards + (newCards === 1 ? " nova)." : " novas).")) : null,
+      h("div", {class:"actions", style:"justify-content:center"},
+        st && hasNext ? h("button", {class:"btn primary", type:"button", onclick:() => playPhase(idx + 1)}, "Próxima fase") : null,
+        h("button", {class:"btn" + (st ? "" : " primary"), type:"button", onclick:() => playPhase(idx)}, "Jogar de novo"),
+        Object.keys(P.deck).length ? h("button", {class:"btn", type:"button", onclick:screenDeck}, icon("cards"), "Revisar o baralho") : null,
+        h("button", {class:"btn", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
+  }
+}
+
+/* --------------------------- baralho de revisão --------------------------- */
+function screenDeck(){
+  const keys = shuffle(Object.keys(P.deck)); let i = 0, learned = 0;
+  if (!keys.length){
+    show(hud(), card("", h("h2", null, "Baralho de revisão"), h("p", null, "Seu baralho está vazio. As palavras que você errar nas fases aparecem aqui."),
+      h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
+    return;
+  }
+  (function next(){
+    if (i >= keys.length){
+      if (!Object.keys(P.deck).length){ P.flags.deckClear = 1; save(); }
+      show(hud(), card("", h("h2", null, "Revisão concluída"), h("p", null, "Você revisou " + keys.length + (keys.length === 1 ? " carta. " : " cartas. ") + learned + (learned === 1 ? " saiu" : " saíram") + " do baralho."),
+        h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
+      return;
+    }
+    const en = keys[i], cardData = P.deck[en]; let flipped = false;
+    const face = h("span", null, en), tip = h("small", null, "Clique para ver a tradução");
+    const yes = h("button", {class:"btn primary", type:"button", disabled:true, onclick:() => { cardData.box = (cardData.box || 0) + 1; if (cardData.box >= 2){ delete P.deck[en]; learned++; } save(); i++; next(); }}, "Já sei");
+    const no = h("button", {class:"btn", type:"button", disabled:true, onclick:() => { cardData.box = 0; save(); i++; next(); }}, "Ainda não sei");
+    const flash = h("button", {class:"flash", type:"button", onclick:() => {
+      flipped = !flipped; face.textContent = flipped ? cardData.pt : en; tip.textContent = flipped ? "Português" : "Clique para ver a tradução";
+      flash.classList.toggle("back", flipped); yes.disabled = no.disabled = false;
+    }}, face, tip);
+    show(hud(), card("", h("h2", null, "Baralho de revisão"), h("p", {class:"muted"}, "Carta " + (i + 1) + " de " + keys.length + ". Uma carta sai do baralho quando você marca \"Já sei\" duas vezes."),
+      flash, h("div", {class:"actions"}, yes, no, h("button", {class:"btn", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
+    flash.focus();
+  })();
+}
+
+function screenProgress(){
+  const acc = P.totSum ? Math.round(P.okSum / P.totSum * 100) + "%" : "-";
+  show(hud(), card("", h("h2", null, "Meu progresso"),
+    h("div", {class:"tiles"},
+      h("div", {class:"tile"}, h("b", null, passedCount() + " de " + PHASE_IDS.length), "fases concluídas"),
+      h("div", {class:"tile"}, h("b", null, starTotal() + " de " + PHASE_IDS.length * 3), "estrelas"),
+      h("div", {class:"tile"}, h("b", null, P.xp), "XP"),
+      h("div", {class:"tile"}, h("b", null, acc), "acerto médio"),
+      h("div", {class:"tile"}, h("b", null, Math.round(P.secs / 60) + " min"), "tempo de jogo"),
+      h("div", {class:"tile"}, h("b", null, P.days.length), P.days.length === 1 ? "dia de treino" : "dias de treino")),
+    h("h3", null, "Conquistas"),
+    h("div", {class:"badges"}, BADGES.map(b => { const ok = b.ok(); return h("div", {class:"badge" + (ok ? "" : " off")}, icon(ok ? b.ic : "lock"), ok ? b.nome : b.como); })),
+    h("h3", {style:"margin-top:20px"}, "Fases"),
+    h("table", {class:"rep"}, h("thead", null, h("tr", null, h("th", null, "Fase"), h("th", null, "Estrelas"), h("th", null, "Melhor resultado"), h("th", null, "Tentativas"))),
+      h("tbody", null, PHASE_IDS.map(id => { const ph = PHASE_BY_ID[id]; return h("tr", null, h("td", null, ph.name), h("td", null, stars(P.stars[id] || 0)),
+        h("td", null, P.best[id] != null && (P.tries[id] || P.stars[id]) ? P.best[id] + " de " + ph.items.length : "-"), h("td", null, P.tries[id] || 0)); }))),
+    h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
+}
+
+function screenCode(){
+  const code = packCode(); const msg = h("p", {class:"muted"});
+  show(hud(), card("", h("h2", null, "Código de progresso"),
+    h("p", null, "Anote este código. Se você trocar de computador, digite o seu nome completo e o código na tela inicial para continuar de onde parou."),
+    h("p", {class:"bigword", style:"margin:14px 0"}, code),
+    h("p", {class:"muted"}, "O código guarda fases, estrelas, XP e o seu robô. O baralho de revisão e as conquistas ficam só neste computador. O código muda quando você avança: anote o mais recente."),
+    h("div", {class:"actions"},
+      h("button", {class:"btn", type:"button", onclick:async () => { msg.textContent = (await copyText(code)) ? "Código copiado." : "Não foi possível copiar. Anote o código."; }}, "Copiar código"),
+      h("button", {class:"btn primary", type:"button", onclick:screenHome}, "Voltar ao mapa")), msg));
+}
+
+flushQueue();
+screenLogin();
+</script>
+</body>
+</html>
