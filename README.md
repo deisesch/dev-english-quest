@@ -1,6 +1,6 @@
 # Dev English Quest
 
-Jogo web para praticar o inglês usado no dia a dia de quem trabalha com tecnologia. Foi criado para alunos do curso Técnico em Desenvolvimento de Sistemas (projeto Edutec) e funciona direto no navegador do computador, sem instalação e sem login.
+Jogo web para praticar o inglês usado no dia a dia de quem trabalha com tecnologia. Foi criado para alunos do curso Técnico em Desenvolvimento de Sistemas da Firjan SENAI Petrópolis e funciona direto no navegador do computador, sem instalação e sem login.
 
 **Jogar:** https://deisesch.github.io/dev-english-quest/
 
@@ -13,14 +13,18 @@ O aluno entra como estagiário na NovaByte, uma empresa fictícia, e sobe de car
 3. Joga as fases em ordem. Cada fase leva de 3 a 5 minutos.
 4. Revisa no baralho as palavras que errou.
 
-## Conteúdo desta versão
+## Conteúdo
+
+São 6 mundos, 30 fases e 252 atividades.
 
 | Mundo | Tema | O que treina |
 |---|---|---|
 | 1. Onboarding | Primeiro dia de trabalho | Cumprimentos, equipamentos, botões, arquivos e pastas |
 | 2. Error messages | Suporte | Mensagens de erro reais de Python, MySQL, Git e terminal |
-
-Em breve: Code and docs, Support tickets, Team chat e Job ready.
+| 3. Code and docs | Programação | Nomes de variáveis, documentação, mensagens de commit e comentários |
+| 4. Support tickets | Atendimento ao cliente | Passado, relato de bug, perguntas e respostas educadas |
+| 5. Team chat | Trabalho em equipe | Reunião diária, pedidos, prazos e e-mails |
+| 6. Job ready | Carreira | README, anúncios de vaga, perfil profissional e entrevista |
 
 ## Recursos
 
@@ -70,7 +74,7 @@ O passo a passo completo está em `GUIA-DE-INSTALACAO.md`.
 
 ## Autoria
 
-Desenvolvido por [deisesch](https://github.com/deisesch) para o projeto Edutec, com apoio de inteligência artificial (Claude, da Anthropic) na programação e na elaboração das atividades.
+Desenvolvido por [deisesch](https://github.com/deisesch) para o curso Técnico em Desenvolvimento de Sistemas da Firjan SENAI Petrópolis, com apoio de inteligência artificial (Claude, da Anthropic) na programação e na elaboração das atividades.
 
 ## Licença
 
