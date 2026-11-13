@@ -1,4 +1,3 @@
-[README.md](https://github.com/user-attachments/files/34808422/README.md)
 # Dev English Quest
 
 Jogo web para praticar o inglês usado no dia a dia de quem trabalha com tecnologia. Foi criado para alunos do curso Técnico em Desenvolvimento de Sistemas (projeto Edutec) e funciona direto no navegador do computador, sem instalação e sem login.
