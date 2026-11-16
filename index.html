@@ -642,7 +642,6 @@ const ICONS = {
   bug:'<path d="M14 24H6M14 31H5M15 37l-7 5M34 24h8M34 31h9M33 37l7 5M21 8l-4-4M27 8l4-4"/><ellipse cx="24" cy="28" rx="10" ry="13" fill="#fff"/><circle cx="24" cy="12" r="5" fill="#1B1464"/><path d="M24 17v24"/>',
   star:'<path d="M24 4l6 14 15 1-12 10 4 15-13-8-13 8 4-15L3 19l15-1z" fill="#FFD23F"/>',
   cards:'<rect x="7" y="13" width="22" height="29" rx="4" fill="#fff" transform="rotate(-10 18 27)"/><rect x="19" y="8" width="22" height="29" rx="4" fill="#3EC5FF" transform="rotate(8 30 22)"/>',
-  key:'<circle cx="15" cy="24" r="8" fill="#FFD23F"/><path d="M23 24h20M36 24v7M42 24v5"/>',
   chart:'<rect x="7" y="26" width="8" height="15" rx="2" fill="#FF5C8A"/><rect x="20" y="16" width="8" height="25" rx="2" fill="#3EC5FF"/><rect x="33" y="7" width="8" height="34" rx="2" fill="#2EE6A6"/>',
   flame:'<path d="M24 4c5 9 13 13 13 25a13 13 0 0 1-26 0c0-7 5-9 7-16 3 3 5 2 6-9z" fill="#FF8A3D"/>',
   bolt:'<path d="M27 4 9 27h12l-3 17 19-24H25z" fill="#FFD23F"/>',
@@ -808,55 +807,6 @@ const BADGES = [
   {ic:"flame", nome:"5 dias de treino", como:"Jogue em 5 dias diferentes", ok:() => P.days.length >= 5}
 ];
 
-/* ======================== CÓDIGO DE PROGRESSO ======================== */
-const ALPHA = "23456789ABCDEFGHJKLMNPQRSTUVWXYZ";
-const CODE_V2_IDS = PHASE_IDS.slice(0, 10);
-function codeFields(ids, tb){
-  const f = [["v",4],["turma",tb],["modoB",1],["done",1],["band",2],["forma",1],["av",3],["xp",12]];
-  ids.forEach(id => f.push(["s" + id, 2]));
-  return f;
-}
-function codeLen(ids, tb){ return Math.ceil(codeFields(ids, tb).reduce((t, x) => t + x[1], 0) / 5); }
-function packCode(){
-  const vals = {v:4, turma:Number(P.turma) - 1, modoB:P.modoB ? 1 : 0, done:P.test ? 1 : 0, band:P.test ? P.test.band : 0,
-    forma:P.test ? P.test.forma - 1 : 0, av:P.av || 0, xp:Math.min(4095, Math.round(P.xp / 10))};
-  PHASE_IDS.forEach(id => { vals["s" + id] = P.stars[id] || 0; });
-  let n = 0n;
-  for (const [k, b] of codeFields(PHASE_IDS, 2)) n = (n << BigInt(b)) | BigInt(vals[k]);
-  const len = codeLen(PHASE_IDS, 2); let s = "";
-  for (let i = 0; i < len; i++){ s = ALPHA[Number(n & 31n)] + s; n >>= 5n; }
-  let ck = 0;
-  for (let i = 0; i < len; i++) ck = (ck + (i + 1) * ALPHA.indexOf(s[i])) % 32;
-  return (s + ALPHA[ck]).match(/.{1,5}/g).join("-");
-}
-function decodeCode(txt){
-  const s = String(txt).toUpperCase().replace(/[^A-Z0-9]/g, "");
-  let ids, ver, tb = 1;
-  if (s.length === codeLen(PHASE_IDS, 2) + 1){ ids = PHASE_IDS; ver = 4; tb = 2; }
-  else if (s.length === codeLen(PHASE_IDS, 1) + 1){ ids = PHASE_IDS; ver = 3; }
-  else if (s.length === codeLen(CODE_V2_IDS, 1) + 1){ ids = CODE_V2_IDS; ver = 2; }
-  else return null;
-  const len = s.length - 1; let ck = 0, n = 0n;
-  for (let i = 0; i < len; i++){ const d = ALPHA.indexOf(s[i]); if (d < 0) return null; ck = (ck + (i + 1) * d) % 32; n = (n << 5n) | BigInt(d); }
-  if (ALPHA[ck] !== s[len]) return null;
-  const out = {}; const f = codeFields(ids, tb);
-  for (let i = f.length - 1; i >= 0; i--){ const b = BigInt(f[i][1]); out[f[i][0]] = Number(n & ((1n << b) - 1n)); n >>= b; }
-  if (out.v !== ver || out.av > 5) return null;
-  out.turma += 1; out.forma += 1;
-  out.turmaAtual = ver === 4;   /* códigos antigos guardavam 1º ano / 2º ano: a turma é escolhida de novo */
-  if (out.turmaAtual && out.turma > CONFIG.TURMAS.length) return null;
-  return out;
-}
-function applyRestore(p, r){
-  p.modoB = !!r.modoB; p.av = r.av; p.xp = Math.max(p.xp, r.xp * 10);
-  PHASE_IDS.forEach(id => {
-    const st = r["s" + id]; if (!st) return;
-    p.stars[id] = Math.max(p.stars[id] || 0, st);
-    p.best[id] = Math.max(p.best[id] || 0, Math.ceil(STAR_MIN[3 - st] * PHASE_BY_ID[id].items.length - 1e-9));
-  });
-  if (r.done && !p.test) p.test = {band:r.band, forma:r.forma, faixa:BANDS[r.band].nome, restored:true};
-}
-
 /* ========================= ENVIO PARA A PLANILHA ========================= */
 function endpointOk(){ return /^https:\/\//.test(CONFIG.ENDPOINT_URL); }
 async function post(payload){
@@ -965,7 +915,6 @@ function screenLogin(){
   const nome = h("input", {type:"text", id:"nome", autocomplete:"off", maxlength:"80"});
   const turma = h("select", {id:"turma"}, h("option", {value:""}, "Selecione"), CONFIG.TURMAS.map((nome, i) => h("option", {value:String(i + 1)}, nome)));
   const modo = h("input", {type:"checkbox", id:"modo"});
-  const code = h("input", {type:"text", id:"code", maxlength:"24", placeholder:"XXXXX-XXXXX-XXXXX-XXXX", autocomplete:"off"});
   const err = h("p", {class:"errmsg", role:"alert"});
   const avBtns = AV_COLORS.map((c, i) => h("button", {class:"av", type:"button", "aria-pressed":i === av ? "true" : "false", "aria-label":"Robô " + (i + 1),
     onclick:() => { av = i; avBtns.forEach((b, j) => b.setAttribute("aria-pressed", j === i ? "true" : "false")); }}, bit(c, "happy")));
@@ -973,16 +922,10 @@ function screenLogin(){
   function go(){
     const n = nome.value.trim().replace(/\s+/g, " ");
     if (n.split(" ").length < 2){ err.textContent = "Digite seu nome completo (nome e sobrenome)."; nome.focus(); return; }
-    let t = turma.value, restored = null;
-    if (code.value.trim()){
-      restored = decodeCode(code.value);
-      if (!restored){ err.textContent = "Código de progresso inválido. Confira as letras e os números."; code.focus(); return; }
-      if (restored.turmaAtual) t = String(restored.turma);
-    }
-    if (!t){ err.textContent = restored ? "Selecione a sua turma na lista. Depois anote o novo código de progresso." : "Selecione a sua turma."; turma.focus(); return; }
+    const t = turma.value;
+    if (!t){ err.textContent = "Selecione a sua turma."; turma.focus(); return; }
     const key = profileKey(n, t);
     const p = profiles[key] || newProfile(n, t, key, av);
-    if (restored) applyRestore(fixProfile(p), restored);
     if (modo.checked) p.modoB = true;
     enter(p);
   }
@@ -1000,13 +943,12 @@ function screenLogin(){
       h("label", {for:"turma"}, "Turma"), turma,
       h("label", null, "Escolha o seu robô"), h("div", {class:"avs"}, avBtns),
       h("label", {class:"check"}, modo, h("span", null, h("b", null, "Modo B"), ": letras maiores, sem cronômetro, sem animações, instruções em destaque e dicas. O conteúdo é o mesmo.")),
-      h("label", {for:"code"}, "Código de progresso (opcional: use só se o seu progresso não voltar sozinho)"), code,
       err,
       h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:go}, "Entrar no jogo")),
-      h("p", {class:"muted", style:"margin-top:14px"}, "Seu nome e seus resultados são enviados apenas para a professora."))
+      h("p", {class:"muted", style:"margin-top:14px"}, "Já jogou em outro computador? Digite o mesmo nome completo e escolha a mesma turma: o jogo continua de onde você parou."),
+      h("p", {class:"muted"}, "Seu nome e seus resultados são enviados apenas para a professora."))
   );
   nome.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
-  code.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
 }
 
 /* Perfis criados antes da lista de turmas atual: o aluno escolhe a turma uma vez e mantém o progresso. */
@@ -1033,7 +975,6 @@ function screenHome(){
   nodes.push(h("div", {class:"actions"},
     h("button", {class:"btn" + (deckN ? " primary" : ""), type:"button", onclick:screenDeck}, icon("cards"), "Baralho de revisão (" + deckN + ")"),
     h("button", {class:"btn", type:"button", onclick:screenProgress}, icon("chart"), "Meu progresso"),
-    h("button", {class:"btn", type:"button", onclick:screenCode}, icon("key"), "Código de progresso"),
     h("button", {class:"btn" + (P.modoB ? " on" : ""), type:"button", "aria-pressed":P.modoB ? "true" : "false", onclick:() => { setModoB(!P.modoB); screenHome(); }}, "Modo B: " + (P.modoB ? "ligado" : "desligado")),
     h("button", {class:"btn", type:"button", onclick:screenLogin}, "Sair")));
   if (!P.test){
@@ -1368,18 +1309,6 @@ function screenProgress(){
       h("tbody", null, PHASE_IDS.map(id => { const ph = PHASE_BY_ID[id]; return h("tr", null, h("td", null, ph.name), h("td", null, stars(P.stars[id] || 0)),
         h("td", null, P.best[id] != null && (P.tries[id] || P.stars[id]) ? P.best[id] + " de " + ph.items.length : "-"), h("td", null, P.tries[id] || 0)); }))),
     h("div", {class:"actions"}, h("button", {class:"btn primary", type:"button", onclick:screenHome}, "Voltar ao mapa"))));
-}
-
-function screenCode(){
-  const code = packCode(); const msg = h("p", {class:"muted"});
-  show(hud(), card("", h("h2", null, "Código de progresso"),
-    h("p", null, "Seu progresso fica guardado com a professora. Em outro computador, digite o mesmo nome completo e escolha a mesma turma: o jogo continua de onde você parou."),
-    h("p", null, "O código abaixo é uma reserva, para quando o computador estiver sem internet."),
-    h("p", {class:"bigword", style:"margin:14px 0"}, code),
-    h("p", {class:"muted"}, "O código guarda fases, estrelas, XP e o seu robô. O baralho de revisão e as conquistas ficam só neste computador. O código muda quando você avança: anote o mais recente."),
-    h("div", {class:"actions"},
-      h("button", {class:"btn", type:"button", onclick:async () => { msg.textContent = (await copyText(code)) ? "Código copiado." : "Não foi possível copiar. Anote o código."; }}, "Copiar código"),
-      h("button", {class:"btn primary", type:"button", onclick:screenHome}, "Voltar ao mapa")), msg));
 }
 
 flushQueue();
